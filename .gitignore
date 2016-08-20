@@ -1,0 +1,9 @@
+# VIM files
+*.swp
+*.swo
+
+# build files
+/build
+/build-html
+/install
+/install-html
