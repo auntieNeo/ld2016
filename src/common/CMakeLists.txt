@@ -4,10 +4,12 @@ add_library(common STATIC
     game.cpp
     glError.cpp
     meshObject.cpp
+    perspectiveCamera.cpp
     scene.cpp
     sceneObject.cpp
     shaders.cpp
     shaderProgram.cpp
+    shaders.cpp
     transform.cpp
     transformRAII.cpp
     transformStack.cpp

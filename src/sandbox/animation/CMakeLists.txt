@@ -12,15 +12,22 @@ if(DEFINED ENV{EMSCRIPTEN})
       "-s USE_BULLET=1"
      )
   string (REPLACE ";" " " EMSCRIPTEN_FLAGS "${EMSCRIPTEN_FLAGS}")
+  set(EMSCRIPTEN_LINK_FLAGS
+      "--preload-file ${CMAKE_CURRENT_SOURCE_DIR}/assets@/assets"
+      "--preload-file ${CMAKE_CURRENT_SOURCE_DIR}/../../common/assets/shaders@/assets/shaders"
+     )
+  string (REPLACE ";" " " EMSCRIPTEN_LINK_FLAGS "${EMSCRIPTEN_LINK_FLAGS}")
   set_target_properties(animation PROPERTIES
       SUFFIX ".html"
       COMPILE_FLAGS "${EMSCRIPTEN_FLAGS}"
-      LINK_FLAGS "${EMSCRIPTEN_FLAGS}"
+      LINK_FLAGS "${EMSCRIPTEN_FLAGS} ${EMSCRIPTEN_LINK_FLAGS}"
       )
   install(TARGETS animation
       RUNTIME DESTINATION html
       )
-  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/animation.js"
+  install(FILES
+      "${CMAKE_CURRENT_BINARY_DIR}/animation.js"
+      "${CMAKE_CURRENT_BINARY_DIR}/animation.data"
       DESTINATION html
       )
 else()

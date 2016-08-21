@@ -23,7 +23,6 @@
 
 #include <cstdio>
 #include <cstdlib>
-#include <getopt.h>
 
 #include "debug.h"
 #include "scene.h"
@@ -32,7 +31,8 @@
 
 namespace ld2016 {
   Game::Game(int argc, char **argv, const char *windowTitle)
-    : m_windowTitle(windowTitle), m_scene(nullptr)
+    : m_windowTitle(windowTitle), m_scene(nullptr),
+    m_width(640), m_height(480)
   {
     m_lastTime = 0.0f;
 

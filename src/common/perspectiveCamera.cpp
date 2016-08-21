@@ -21,35 +21,33 @@
  * IN THE SOFTWARE.
  */
 
-#ifndef LD2016_COMMON_MESH_OBJECT_H_
-#define LD2016_COMMON_MESH_OBJECT_H_
+#include <cmath>
+#include <glm/gtc/matrix_transform.hpp>
 
-#include <GL/glew.h>
-#include <string>
-
-#include "sceneObject.h"
+#include "perspectiveCamera.h"
 
 namespace ld2016 {
-  class MeshObject : public SceneObject {
-    private:
-      typedef struct {
-        float pos[3];
-        float norm[3];
-        float tex[2];
-      } MeshVertex;
+  PerspectiveCamera::PerspectiveCamera(float fovy, float near, float far,
+      const glm::vec3 &position, const glm::quat &orientation)
+    : Camera(position, orientation),
+      m_fovy(fovy), m_prevFovy(fovy),
+      m_near(near), m_far(far)
+  {
+  }
 
-      std::string m_meshFile;
-      GLuint m_vertexBuffer, m_indexBuffer;
+  PerspectiveCamera::~PerspectiveCamera() {
+  }
 
-      void m_loadMesh(const std::string &meshFile);
-    public:
-      MeshObject(const std::string &meshFile);
-      virtual ~MeshObject();
+  glm::mat4 PerspectiveCamera::projection(
+      float aspect, float alpha) const
+  {
+    // Linearly interpolate changes in FOV between ticks
+    float fovy = (1.0f - alpha) * m_prevFovy + alpha * m_fovy;
 
-      virtual void draw(const glm::mat4 &modelWorld,
-          const glm::mat4 &worldView, const glm::mat4 &projection,
-          float alpha, bool debug);
-  };
+    return glm::perspective(fovy, aspect, m_near, m_far);
+  }
+
+  float PerspectiveCamera::focalLength() const {
+    return 1.0f / tan(0.5f * m_fovy);
+  }
 }
-
-#endif
