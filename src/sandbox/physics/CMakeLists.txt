@@ -21,6 +21,7 @@ if(DEFINED ENV{EMSCRIPTEN})
       )
 else()
 target_link_libraries(physics
-    ${BULLET_LIBRARIES}
+      ${BULLET_LIBRARIES}
+      ${SDL2_LIBRARY}
     )
 endif()

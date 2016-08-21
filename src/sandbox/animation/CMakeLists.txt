@@ -25,6 +25,9 @@ if(DEFINED ENV{EMSCRIPTEN})
       )
 else()
 target_link_libraries(animation
-    ${BULLET_LIBRARIES}
+      ${BULLET_LIBRARIES}
+      ${SDL2_LIBRARY}
+      ${GLEW_LIBRARY}
+      ${OPENGL_LIBRARIES}
     )
 endif()

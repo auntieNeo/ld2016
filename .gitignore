@@ -7,3 +7,7 @@
 /build-html
 /install
 /install-html
+/buildNative
+
+# clion files
+/.idea
