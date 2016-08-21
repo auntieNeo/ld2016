@@ -1,5 +1,7 @@
 @echo off
 set MAKE="C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\nmake.exe"
+set PATH=%PATH%;%EMSCRIPTEN%\bin
+call "C:\Program Files\Emscripten\emsdk_env.bat"
 call :build_assimp
 rem call :build_bullet
 call :build
@@ -47,4 +49,5 @@ call emcmake cmake^
 call %MAKE% -j %NUMBER_OF_PROCESSORS%
 call %MAKE% install
 cd ..
+echo "Done!"
 goto :eof
