@@ -36,8 +36,14 @@ else()
 target_link_libraries(animation
       ${BULLET_LIBRARIES}
       ${SDL2_LIBRARY}
+      ${SDL2_IMAGE_LIBRARY}
       ${GLEW_LIBRARY}
       ${OPENGL_LIBRARIES}
       ${ASSIMP_LIBRARY}
     )
+
+#Copy assets to the build folder. 
+add_custom_command(TARGET animation PRE_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory
+                       ${CMAKE_SOURCE_DIR}/src/sandbox/animation/assets $<TARGET_FILE_DIR:animation>/assets)
 endif()
