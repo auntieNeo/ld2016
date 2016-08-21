@@ -4,6 +4,8 @@ set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 project(ld2016)
 set(CMAKE_BUILD_TYPE debug)
 
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
 if(DEFINED ENV{EMSCRIPTEN})
   if(CMAKE_BUILD_TYPE MATCHES debug)
     set(EMSCRIPTEN_FLAGS
@@ -38,17 +40,34 @@ if(DEFINED ENV{EMSCRIPTEN})
   # C++ demangle support with Emscripten
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s DEMANGLE_SUPPORT=1")
 
+  # Temporarily disable the default Emscripten behavior of ignoring system
+  # include directories so that we can include the header-only GLM library
+  set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH)
+
+  # GLM Mathematics Library
+  find_package(GLM REQUIRED)
+
+  set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+
   # Asset Import library for loading meshes
-  set(ASSIMP_LIBRARIES ${CMAKE_SOURCE_DIR}/extern/assimp/install-js/lib/libassimp.so)
+  set(ASSIMP_LIBRARIES "${CMAKE_SOURCE_DIR}/extern/assimp/install-js/lib/libassimp.so")
   include_directories(SYSTEM
+      ${GLM_INCLUDE_DIR}
       ./extern/assimp/install-js/include/
       )
 else()
   find_package(Bullet REQUIRED)
-endif()
+  include_directories( SYSTEM ${BULLET_INCLUDE_DIRS} )
+  include_directories( SYSTEM extern/glm )
 
-#include_directories(SYSTEM
-#    ${BULLET_INCLUDE_DIRS}
-#    )
+  find_package( SDL2 REQUIRED )
+  include_directories( SYSTEM ${SDL2_INCLUDE_DIR} )
+
+  find_package( GLEW REQUIRED )
+  include_directories( ${GLEW_INCLUDE_PATH} )
+
+  find_package( OpenGL REQUIRED )
+  include_directories( ${OPENGL_INCLUDE_DIR} )
+endif()
 
 add_subdirectory("./src")

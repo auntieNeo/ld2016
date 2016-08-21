@@ -30,7 +30,7 @@
 #include <memory>
 #include <unordered_map>
 
-namespace mc { namespace samples {
+namespace ld2016 {
   class Transform;
   /**
    * This abstract class defines a typical object in a 3D graphics scene.
@@ -193,7 +193,7 @@ namespace mc { namespace samples {
           const glm::mat4 &worldView, const glm::mat4 &projection,
           float alpha, bool debug) {}
   };
-} }
+}
 
 #endif
 

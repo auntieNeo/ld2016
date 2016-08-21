@@ -1,5 +1,10 @@
-add_executable(physics
-    main.cpp
+add_executable(hello
+        main.cpp
+        cameraOrbit.cpp cameraOrbit.h
+        )
+target_link_libraries(hello
+        common
+        ${ASSIMP_LIBRARIES}
     )
 
 if(DEFINED ENV{EMSCRIPTEN})
@@ -8,20 +13,22 @@ if(DEFINED ENV{EMSCRIPTEN})
       "-s USE_BULLET=1"
      )
   string (REPLACE ";" " " EMSCRIPTEN_FLAGS "${EMSCRIPTEN_FLAGS}")
-  set_target_properties(physics PROPERTIES
+  set_target_properties(hello PROPERTIES
       SUFFIX ".html"
       COMPILE_FLAGS "${EMSCRIPTEN_FLAGS}"
       LINK_FLAGS "${EMSCRIPTEN_FLAGS}"
       )
-  install(TARGETS physics
+  install(TARGETS hello
       RUNTIME DESTINATION html
       )
-  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/physics.js"
+  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/hello.js"
       DESTINATION html
       )
 else()
-target_link_libraries(physics
+target_link_libraries(hello
       ${BULLET_LIBRARIES}
       ${SDL2_LIBRARY}
+      ${GLEW_LIBRARY}
+      ${OPENGL_LIBRARIES}
     )
 endif()

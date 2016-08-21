@@ -27,7 +27,7 @@
 
 #include "scene.h"
 
-namespace mc { namespace samples {
+namespace ld2016 {
   Scene::Scene() {
     // TODO
   }
@@ -81,4 +81,4 @@ namespace mc { namespace samples {
           debug);
     }
   }
-} }
+}
