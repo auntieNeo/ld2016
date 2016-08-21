@@ -39,16 +39,19 @@ namespace ld2016 {
       } MeshVertex;
 
       std::string m_meshFile;
-      GLuint m_vertexBuffer, m_indexBuffer;
+      GLuint m_vertexBuffer, m_indexBuffer, m_texture;
       int m_numIndices;
 
       void m_loadMesh(const std::string &meshFile);
+      void m_loadTexture(const std::string &textureFile);
 
       void m_drawSurface(
           const glm::mat4 &modelView,
           const glm::mat4 &projection);
     public:
-      MeshObject(const std::string &meshFile);
+      MeshObject(
+          const std::string &meshFile,
+          const std::string &textureFile);
       virtual ~MeshObject();
 
       virtual void draw(const glm::mat4 &modelWorld,

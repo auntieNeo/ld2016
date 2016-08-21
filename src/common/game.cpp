@@ -21,6 +21,7 @@
  * IN THE SOFTWARE.
  */
 
+#include <SDL_image.h>
 #include <cstdio>
 #include <cstdlib>
 
@@ -38,6 +39,7 @@ namespace ld2016 {
 
     // Initialize the graphics
     m_initSdl();
+    m_initSdlImage();
     m_initGl();
 
     // Initialize the graphics scene
@@ -50,6 +52,9 @@ namespace ld2016 {
 
     // TODO: Free GL resources
     // TODO: Free SDL resources
+
+    // Free SDL Image resources
+    IMG_Quit();
   }
 
   void Game::m_initSdl() {
@@ -70,6 +75,15 @@ namespace ld2016 {
       fprintf(stderr, "Failed to create SDL window: %s\n",
           SDL_GetError());
       exit(EXIT_FAILURE);
+    }
+  }
+
+  void Game::m_initSdlImage() {
+    static const int flags = IMG_INIT_PNG | IMG_INIT_JPG;
+    int success = IMG_Init(flags);
+    if ((success & flags) != flags) {
+      fprintf(stderr, "Failed to initialize PNG and JPEG support: %s\n",
+          IMG_GetError());
     }
   }
 

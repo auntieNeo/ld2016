@@ -57,7 +57,10 @@ class AnimationDemo : public Game {
       this->scene()->addObject(m_camera);
       this->setCamera(m_camera);
       m_mesh = std::shared_ptr<MeshObject>(
-          new MeshObject("assets/models/sphere.dae"));
+          new MeshObject(
+            "assets/models/sphere.dae",  // mesh
+            "assets/textures/rt_bunny.png"  // texture
+            ));
       this->scene()->addObject(m_mesh);
       float delta = 0.3f;
       for (int i = 0; i < 100; ++i) {

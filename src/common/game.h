@@ -41,6 +41,7 @@ namespace ld2016 {
       float m_lastTime;
 
       void m_initSdl();
+      void m_initSdlImage();
       void m_initGl();
       void m_initScene();
     public:
