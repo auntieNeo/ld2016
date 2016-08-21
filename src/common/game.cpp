@@ -90,6 +90,12 @@ namespace ld2016 {
       exit(EXIT_FAILURE);
     }
 
+    // Set vSync
+    if (SDL_GL_SetSwapInterval(1) != 0) {
+      fprintf(stderr, "Failed to enable VSync: %s\n", SDL_GetError());
+      // No need to exit
+    }
+
     // Configure the GL
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glClearDepth(1.0);
