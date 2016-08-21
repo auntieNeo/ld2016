@@ -11,3 +11,6 @@
 
 # clion files
 /.idea
+
+# visual studio files
+/visual_env
