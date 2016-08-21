@@ -71,6 +71,10 @@ namespace ld2016 {
           SDL_GetError());
       exit(EXIT_FAILURE);
     }
+    if (SDL_GL_SetSwapInterval(1) != 0) {
+      fprintf(stderr, "Failed to enable VSync: %s\n", SDL_GetError());
+      // No need to exit?
+    }
   }
 
   void Game::m_initGl() {
