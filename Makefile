@@ -20,6 +20,7 @@ build-html: assimp-js
 	&& emconfigure cmake \
 		-DGLM_ROOT_DIR=./extern/glm \
 		-DCMAKE_INSTALL_PREFIX=../install-html \
+    -DEMSCRIPTEN_ENABLED=ON \
 		.. \
 	&& emmake make -j $(num_threads) \
 	&& emmake make install
