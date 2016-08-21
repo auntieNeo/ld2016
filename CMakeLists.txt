@@ -74,6 +74,9 @@ else()
   find_package( ASSIMP REQUIRED )
   include_directories( SYSTEM ${ASSIMP_INCLUDE_DIR} )
 
+  find_package( SDL2_Image REQUIRED )
+  include_directories( ${SDL2_IMAGE_INCLUDE_DIR} )
+
   get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
   foreach(dir ${dirs})
     message(STATUS "dir='${dir}'")
