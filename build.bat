@@ -1,6 +1,7 @@
 @echo off
 set MAKE="C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\nmake.exe"
 set PATH=%PATH%;%EMSCRIPTEN%\bin
+set EMSCRIPTEN_ENABLED=true
 call "C:\Program Files\Emscripten\emsdk_env.bat"
 call :build_assimp
 rem call :build_bullet
@@ -45,6 +46,7 @@ call emcmake cmake^
  -DCMAKE_MAKE_PROGRAM=%MAKE%^
  -DCMAKE_INSTALL_PREFIX=..\install-html^
  -G "Unix Makefiles"^
+ -DGLM_ROOT_DIR=..\extern\glm^
  ..
 call %MAKE% -j %NUMBER_OF_PROCESSORS%
 call %MAKE% install

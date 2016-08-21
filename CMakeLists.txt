@@ -6,7 +6,7 @@ set(CMAKE_BUILD_TYPE debug)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-if(DEFINED ENV{EMSCRIPTEN})
+if(DEFINED ENV{EMSCRIPTEN} AND DEFINED ENV{EMSCRIPTEN_ENABLED})
   if(CMAKE_BUILD_TYPE MATCHES debug)
     set(EMSCRIPTEN_FLAGS
         "-O1"
@@ -45,15 +45,15 @@ if(DEFINED ENV{EMSCRIPTEN})
   set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH)
 
   # GLM Mathematics Library
-  find_package(GLM REQUIRED)
+  #find_package(GLM REQUIRED)
 
   set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
   # Asset Import library for loading meshes
   set(ASSIMP_LIBRARIES "${CMAKE_SOURCE_DIR}/extern/assimp/install-js/lib/libassimp.so")
   include_directories(SYSTEM
-      ${GLM_INCLUDE_DIR}
       ./extern/assimp/install-js/include/
+      ./extern/glm/
       )
 else()
   find_package(Bullet REQUIRED)
