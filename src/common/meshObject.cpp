@@ -41,7 +41,8 @@ namespace ld2016 {
     // Load the mesh from file using assimp
     m_loadMesh(meshFile);
     // Load the texture from file using SDL2
-    m_loadTexture(textureFile);
+    
+    // m_loadTexture(textureFile);
   }
 
   MeshObject::~MeshObject() {
