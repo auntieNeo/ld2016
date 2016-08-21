@@ -3,6 +3,7 @@ num_threads = $(shell echo $$(($(num_cpus) + 1)))
 
 all: build-html
 
+.PHONY: build
 build: assimp bullet
 	mkdir -p build \
 	&& cd build \
@@ -12,6 +13,7 @@ build: assimp bullet
 		.. \
 	&& make -j $(num_threads)
 
+.PHONY: build-html
 build-html: assimp-js
 	mkdir -p build-html install-html \
 	&& cd build-html \
@@ -22,29 +24,32 @@ build-html: assimp-js
 	&& emmake make -j $(num_threads) \
 	&& emmake make install
 
+.PHONY: assimp
 assimp:
-	cd extern/assimp \
-	&& mkdir -p build install \
-	&& cd build \
+	cd extern \
+	&& mkdir -p assimp-build assimp-install \
+	&& cd assimp-build \
 	&& cmake \
 		-DCMAKE_BUILD_TYPE=debug \
-		-DCMAKE_INSTALL_PREFIX=../install \
+		-DCMAKE_INSTALL_PREFIX=../assimp-install \
 		-DASSIMP_BUILD_TESTS=OFF \
-		.. \
+		../assimp \
 	&& make -j $(num_threads) \
 	&& make install
 
+.PHONY: assimp-js
 assimp-js:
-	cd extern/assimp \
-	&& mkdir -p build-js install-js \
-	&& cd build-js \
+	cd extern \
+	&& mkdir -p assimp-build-js assimp-install-js \
+	&& cd assimp-build-js \
 	&& emconfigure cmake \
 		-DCMAKE_BUILD_TYPE=release \
-		-DCMAKE_INSTALL_PREFIX=../install-js \
+		-DCMAKE_INSTALL_PREFIX=../assimp-install-js \
 		-DASSIMP_BUILD_TESTS=OFF \
-		.. \
+		../assimp \
 	&& emmake make -j $(num_threads) all install
 
+.PHONY: bullet
 bullet:
 	cd extern/bullet3 \
 	&& mkdir -p build install \
@@ -58,6 +63,7 @@ bullet:
 	&& make -j $(num_threads) \
 	&& make install
 
+.PHONY: bullet-js
 bullet-js:
 	cd extern/bullet3 \
 	&& mkdir -p build-js install-js \
@@ -71,10 +77,10 @@ bullet-js:
 	&& emmake make -j $(num_threads) \
 	&& emmake make install
 
+.PHONY: clean
 clean:
-	rm -rf extern/bullet3/{build,install}
-	rm -rf extern/bullet3/{build-js,install-js}
-	rm -rf extern/assimp/{build,install}
-	rm -rf extern/assimp/{build-js,install-js}
+	rm -rf extern/*{build,install}
+	rm -rf extern/*{build,install}-js
 	rm -rf build
+	rm -rf {build,install}-html
 

@@ -50,10 +50,10 @@ if(DEFINED ENV{EMSCRIPTEN})
   set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
   # Asset Import library for loading meshes
-  set(ASSIMP_LIBRARIES "${CMAKE_SOURCE_DIR}/extern/assimp/install-js/lib/libassimp.so")
+  set(ASSIMP_LIBRARIES "${CMAKE_SOURCE_DIR}/extern/assimp-install-js/lib/libassimp.so")
   include_directories(SYSTEM
       ${GLM_INCLUDE_DIR}
-      ./extern/assimp/install-js/include/
+      ./extern/assimp-install-js/include/
       )
 else()
   find_package(Bullet REQUIRED)

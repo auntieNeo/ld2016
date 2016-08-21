@@ -1,0 +1,5 @@
+# Emscripten build directories
+/assimp-build-js
+/assimp-install-js
+/bullet3-build-js
+/bullet3-install-js
