@@ -7,7 +7,7 @@ target_link_libraries(hello
         ${ASSIMP_LIBRARIES}
     )
 
-if(DEFINED ENV{EMSCRIPTEN})
+if(DEFINED ENV{EMSCRIPTEN} AND EMSCRIPTEN_ENABLED)
   set(EMSCRIPTEN_FLAGS
       "-s USE_SDL=2"
       "-s USE_BULLET=1"

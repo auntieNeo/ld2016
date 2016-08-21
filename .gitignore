@@ -11,3 +11,7 @@
 
 # clion files
 /.idea
+
+# visual studio
+/build-msvs
+
