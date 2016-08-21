@@ -27,7 +27,7 @@
 
 #include "sceneObject.h"
 
-namespace mc { namespace samples {
+namespace ld2016 {
   SceneObject::SceneObject(
       const glm::vec3 &position, const glm::quat &orientation)
     : m_position(position), m_prevPosition(position),
@@ -75,4 +75,4 @@ namespace mc { namespace samples {
     // do not have m_parent members at the time of this writing).
     m_children.erase(iterator);
   }
-} }
+}

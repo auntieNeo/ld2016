@@ -1,5 +1,9 @@
-add_executable(physics
+add_executable(animation
     main.cpp
+    )
+target_link_libraries(animation
+    common
+    ${ASSIMP_LIBRARIES}
     )
 
 if(DEFINED ENV{EMSCRIPTEN})
@@ -8,19 +12,19 @@ if(DEFINED ENV{EMSCRIPTEN})
       "-s USE_BULLET=1"
      )
   string (REPLACE ";" " " EMSCRIPTEN_FLAGS "${EMSCRIPTEN_FLAGS}")
-  set_target_properties(physics PROPERTIES
+  set_target_properties(animation PROPERTIES
       SUFFIX ".html"
       COMPILE_FLAGS "${EMSCRIPTEN_FLAGS}"
       LINK_FLAGS "${EMSCRIPTEN_FLAGS}"
       )
-  install(TARGETS physics
+  install(TARGETS animation
       RUNTIME DESTINATION html
       )
-  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/physics.js"
+  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/animation.js"
       DESTINATION html
       )
 else()
-target_link_libraries(physics
+target_link_libraries(animation
     ${BULLET_LIBRARIES}
     )
 endif()

@@ -29,7 +29,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace mc { namespace samples {
+namespace ld2016 {
   class Camera;
   class SceneObject;
   /**
@@ -109,6 +109,6 @@ namespace mc { namespace samples {
       void draw(const Camera &camera, float aspect,
           float alpha = 1.0, bool debug = false) const;
   };
-} }
+}
 
 #endif

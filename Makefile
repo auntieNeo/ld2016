@@ -7,6 +7,7 @@ build: assimp bullet
 	mkdir -p build \
 	&& cd build \
 	&& cmake \
+		-DGLM_ROOT_DIR=./extern/glm \
 		-DBULLET_ROOT=./extern/bullet3/install \
 		.. \
 	&& make -j $(num_threads)
@@ -15,6 +16,7 @@ build-html: assimp-js
 	mkdir -p build-html install-html \
 	&& cd build-html \
 	&& emconfigure cmake \
+		-DGLM_ROOT_DIR=./extern/glm \
 		-DCMAKE_INSTALL_PREFIX=../install-html \
 		.. \
 	&& emmake make -j $(num_threads) \
@@ -37,7 +39,7 @@ assimp-js:
 	&& mkdir -p build-js install-js \
 	&& cd build-js \
 	&& emconfigure cmake \
-		-DCMAKE_BUILD_TYPE=debug \
+		-DCMAKE_BUILD_TYPE=release \
 		-DCMAKE_INSTALL_PREFIX=../install-js \
 		-DASSIMP_BUILD_TESTS=OFF \
 		.. \
