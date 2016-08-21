@@ -2,7 +2,7 @@ add_executable(physics
     main.cpp
     )
 
-if(DEFINED ENV{EMSCRIPTEN})
+if(DEFINED ENV{EMSCRIPTEN} AND DEFINED ENV{EMSCRIPTEN_ENABLED})
   set(EMSCRIPTEN_FLAGS
       "-s USE_SDL=2"
       "-s USE_BULLET=1"

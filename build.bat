@@ -1,6 +1,7 @@
 @echo off
 set MAKE="C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\nmake.exe"
 set PATH=%PATH%;%EMSCRIPTEN%\bin
+set EMSCRIPTEN_ENABLED=true
 call "C:\Program Files\Emscripten\emsdk_env.bat"
 call :build_assimp
 rem call :build_bullet
@@ -8,18 +9,18 @@ call :build
 goto :eof
 
 :build_assimp
-mkdir extern\assimp\build-js
-mkdir extern\assimp\install-js
-cd extern\assimp\build-js
+mkdir extern\assimp-build-js
+mkdir extern\assimp-install-js
+cd extern\assimp-build-js
 call emcmake cmake^
  -DCMAKE_MAKE_PROGRAM=%MAKE%^
- -DCMAKE_INSTALL_PREFIX=..\install-js^
+ -DCMAKE_INSTALL_PREFIX=..\assimp-install-js^
  -G "Unix Makefiles"^
  -DASSIMP_BUILD_TESTS=OFF^
- ..
+ ..\assimp
 call %MAKE% -j %NUMBER_OF_PROCESSORS%
 call %MAKE% install
-cd ..\..\..
+cd ..\..
 goto :eof
 
 :build_bullet
