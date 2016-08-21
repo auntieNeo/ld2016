@@ -24,8 +24,11 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "glError.h"
+#include "shaderProgram.h"
+#include "shaders.h"
 
 #include "meshObject.h"
 
@@ -99,8 +102,105 @@ namespace ld2016 {
         );
     FORCE_ASSERT_GL_ERROR();
     delete[] vertices;
+    // Copy the face data into an index buffer
+    uint32_t *indices = new uint32_t[3 * aim->mNumFaces];
+    for (int i = 0; i < aim->mNumFaces; ++i) {
+      assert(aim->mFaces[i].mNumIndices == 3);
+      indices[i * 3] = aim->mFaces[i].mIndices[0];
+      indices[i * 3 + 1] = aim->mFaces[i].mIndices[1];
+      indices[i * 3 + 2] = aim->mFaces[i].mIndices[2];
+    }
+    // Copy the index data to the GL
+    glGenBuffers(1, &m_indexBuffer);
+    FORCE_ASSERT_GL_ERROR();
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+    FORCE_ASSERT_GL_ERROR();
+    glBufferData(
+        GL_ELEMENT_ARRAY_BUFFER,  // target
+        sizeof(uint32_t) * 3 * aim->mNumFaces,  // size
+        indices,  // data
+        GL_STATIC_DRAW  // usage
+        );
+    FORCE_ASSERT_GL_ERROR();
+    delete[] indices;
+    m_numIndices = aim->mNumFaces * 3;
   }
 
   MeshObject::~MeshObject() {
+  }
+
+  void MeshObject::m_drawSurface(
+      const glm::mat4 &modelView,
+      const glm::mat4 &projection)
+  {
+    // Use a simple shader
+    auto shader = Shaders::gouraudShader();
+    shader->use();
+
+    // Prepare the uniform values
+    assert(shader->modelViewLocation() != -1);
+    glUniformMatrix4fv(
+        shader->modelViewLocation(),  // location
+        1,  // count
+        0,  // transpose
+        glm::value_ptr(modelView)  // value
+        );
+    ASSERT_GL_ERROR();
+    assert(shader->projectionLocation() != -1);
+    glUniformMatrix4fv(
+        shader->projectionLocation(),  // location
+        1,  // count
+        0,  // transpose
+        glm::value_ptr(projection)  // value
+        );
+    ASSERT_GL_ERROR();
+
+    // Prepare the vertex attributes
+    glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+    ASSERT_GL_ERROR();
+    assert(shader->vertPositionLocation() != -1);
+    glEnableVertexAttribArray(shader->vertPositionLocation());
+    ASSERT_GL_ERROR();
+    glVertexAttribPointer(
+        shader->vertPositionLocation(),  // index
+        3,  // size
+        GL_FLOAT,  // type
+        0,  // normalized
+        sizeof(MeshVertex),  // stride
+        &(((MeshVertex *)0)->pos[0])  // pointer
+        );
+    ASSERT_GL_ERROR();
+    assert(shader->vertNormalLocation() != -1);
+    glEnableVertexAttribArray(shader->vertNormalLocation());
+    ASSERT_GL_ERROR();
+    glVertexAttribPointer(
+        shader->vertNormalLocation(),  // index
+        3,  // size
+        GL_FLOAT,  // type
+        0,  // normalized
+        sizeof(MeshVertex),  // stride
+        &(((MeshVertex *)0)->norm[0])  // pointer
+        );
+    ASSERT_GL_ERROR();
+
+    // Draw the surface
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+    ASSERT_GL_ERROR();
+    glDrawElements(
+        GL_TRIANGLES,  // mode
+        m_numIndices,  // count
+        GL_UNSIGNED_INT,  // type
+        0  // indices
+        );
+    ASSERT_GL_ERROR();
+  }
+
+  void MeshObject::draw(const glm::mat4 &modelWorld,
+      const glm::mat4 &worldView, const glm::mat4 &projection,
+      float alpha, bool debug)
+  {
+    glm::mat4 modelView = worldView * modelWorld;
+
+    m_drawSurface(modelView, projection);
   }
 }

@@ -30,33 +30,35 @@
 #include "../../common/debug.h"
 #include "../../common/game.h"
 #include "../../common/meshObject.h"
-#include "../../common/perspectiveCamera.h"
 #include "../../common/scene.h"
+#include "../../common/wasdCamera.h"
 
 using namespace ld2016;
 
 class AnimationDemo : public Game {
   private:
-    std::shared_ptr<PerspectiveCamera> m_camera;
+    std::shared_ptr<WasdCamera> m_camera;
     std::shared_ptr<MeshObject> m_mesh;
   public:
     AnimationDemo(int argc, char **argv)
       : Game(argc, argv, "Animation Demo")
     {
       // Populate the graphics scene
-      m_camera = std::shared_ptr<PerspectiveCamera>(
-          new PerspectiveCamera(
-            78.0f * ((float)M_PI / 180.0f),  // fovy
+      m_camera = std::shared_ptr<WasdCamera>(
+          new WasdCamera(
+            80.0f * ((float)M_PI / 180.0f),  // fovy
             0.1f,  // near
-            1000.0f,  // far
-            glm::vec3(0.0f, -2.0f, 0.0f),  // position
+            100000.0f,  // far
+            glm::vec3(0.0f, 0.0f, 15.0f),  // position
             glm::angleAxis(
-              (float)M_PI / 2.0f,
+              (float)M_PI / 4.0f,
               glm::vec3(1.0f, 0.0f, 0.0f))  // orientation
             ));
       this->scene()->addObject(m_camera);
       this->setCamera(m_camera);
-//      this->scene()->addObject(m_mesh);
+      m_mesh = std::shared_ptr<MeshObject>(
+          new MeshObject("assets/models/sphere.dae"));
+      this->scene()->addObject(m_mesh);
       float delta = 0.3f;
       for (int i = 0; i < 100; ++i) {
         Debug::drawLine(

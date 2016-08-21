@@ -40,8 +40,13 @@ namespace ld2016 {
 
       std::string m_meshFile;
       GLuint m_vertexBuffer, m_indexBuffer;
+      int m_numIndices;
 
       void m_loadMesh(const std::string &meshFile);
+
+      void m_drawSurface(
+          const glm::mat4 &modelView,
+          const glm::mat4 &projection);
     public:
       MeshObject(const std::string &meshFile);
       virtual ~MeshObject();

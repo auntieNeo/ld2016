@@ -5,7 +5,6 @@ attribute vec3 vertNormal;
 
 uniform mat4 modelView;
 uniform mat4 projection;
-uniform mat4 modelViewProjection;
 uniform mat4 normalTransform;
 
 uniform vec3 lightPosition;
@@ -25,5 +24,5 @@ void main() {
   color = lightIntensity * max(dot(lightVector, vec3(eyeNormal)), 0.0)
           + ambient;
 
-  gl_Position = modelViewProjection * vec4(vertPosition, 1.0);
+  gl_Position = projection * modelView * vec4(vertPosition, 1.0);
 }

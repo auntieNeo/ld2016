@@ -7,12 +7,13 @@ add_library(common STATIC
     perspectiveCamera.cpp
     scene.cpp
     sceneObject.cpp
-    shaders.cpp
     shaderProgram.cpp
+    shaders.cpp
     shaders.cpp
     transform.cpp
     transformRAII.cpp
     transformStack.cpp
+    wasdCamera.cpp
     )
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
