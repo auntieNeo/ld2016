@@ -5,11 +5,14 @@ add_library(common STATIC
     meshObject.cpp
     scene.cpp
     sceneObject.cpp
+    shaders.cpp
     shaderProgram.cpp
     transform.cpp
     transformRAII.cpp
     transformStack.cpp
     )
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 if(DEFINED ENV{EMSCRIPTEN})
   set(EMSCRIPTEN_FLAGS

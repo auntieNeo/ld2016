@@ -57,10 +57,17 @@ if(DEFINED ENV{EMSCRIPTEN})
       )
 else()
   find_package(Bullet REQUIRED)
-endif()
+  include_directories( SYSTEM ${BULLET_INCLUDE_DIRS} )
+  include_directories( SYSTEM extern/glm )
 
-#include_directories(SYSTEM
-#    ${BULLET_INCLUDE_DIRS}
-#    )
+  find_package( SDL2 REQUIRED )
+  include_directories( SYSTEM ${SDL2_INCLUDE_DIR} )
+
+  find_package( GLEW REQUIRED )
+  include_directories( ${GLEW_INCLUDE_PATH} )
+
+  find_package( OpenGL REQUIRED )
+  include_directories( ${OPENGL_INCLUDE_DIR} )
+endif()
 
 add_subdirectory("./src")
