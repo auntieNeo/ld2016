@@ -1,5 +1,5 @@
 @echo off
-set MAKE=c:\MinGW\bin\mingw32-make.exe
+set MAKE="C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\nmake.exe"
 call :build_assimp
 rem call :build_bullet
 call :build
