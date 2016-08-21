@@ -58,7 +58,7 @@ if(DEFINED ENV{EMSCRIPTEN} AND EMSCRIPTEN_ENABLED)
       ./extern/glm/
       )
 else()
-  find_package(Bullet REQUIRED)
+  find_package( Bullet REQUIRED )
   include_directories( SYSTEM ${BULLET_INCLUDE_DIRS} )
   include_directories( SYSTEM extern/glm )
 
@@ -66,13 +66,13 @@ else()
   include_directories( SYSTEM ${SDL2_INCLUDE_DIR} )
 
   find_package( GLEW REQUIRED )
-  include_directories( ${GLEW_INCLUDE_DIR} )
+  include_directories( SYSTEM ${GLEW_INCLUDE_DIR} )
 
   find_package( OpenGL REQUIRED )
-  include_directories( ${OPENGL_INCLUDE_DIR} )
+  include_directories( SYSTEM ${OPENGL_INCLUDE_DIR} )
 
   find_package( ASSIMP REQUIRED )
-  include_directories( ${ASSIMP_INCLUDE_DIR} )
+  include_directories( SYSTEM ${ASSIMP_INCLUDE_DIR} )
 
   get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
   foreach(dir ${dirs})

@@ -7,16 +7,16 @@
 
 #include "../../common/game.h"
 #include "../../common/meshObject.h"
-#include "cameraOrbit.h"
+#include "orbitCamera.h"
 
 using namespace ld2016;
 
 class HelloDemo : public Game {
-    std::shared_ptr<CameraOrbit> camera;
+    std::shared_ptr<orbitCamera> camera;
 public:
     HelloDemo(int argc, char** argv, glm::vec3&& position, glm::quat&& orientation)
             : Game(argc, argv, "Animation Demo"),
-              camera(std::make_shared<CameraOrbit>(position, orientation))
+              camera(std::make_shared<orbitCamera>(position, orientation))
     {
         setCamera(camera);
     }
