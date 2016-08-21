@@ -1,9 +1,10 @@
 add_executable(hello
-    main.cpp
-    )
+        main.cpp
+        cameraOrbit.cpp cameraOrbit.h
+        )
 target_link_libraries(hello
-    common
-    ${ASSIMP_LIBRARIES}
+        common
+        ${ASSIMP_LIBRARIES}
     )
 
 if(DEFINED ENV{EMSCRIPTEN})

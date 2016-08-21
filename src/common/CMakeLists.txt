@@ -1,4 +1,5 @@
 add_library(common STATIC
+    camera.cpp
     debug.cpp
     game.cpp
     glError.cpp
