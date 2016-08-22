@@ -28,14 +28,16 @@
 
 namespace ld2016 {
 
-    class orbitCamera : public Camera {
-        glm::vec3 position;
-        glm::quat orientation;
+  class orbitCamera : public Camera {
+      glm::vec3 position;
+      glm::quat orientation;
     public:
-        orbitCamera(const glm::vec3 &position, const glm::quat &orientation);
-        ~orbitCamera();
-        glm::mat4 projection(float aspect, float alpha = 1.0f) const;
-    };
+      orbitCamera(const glm::vec3 &position, const glm::quat &orientation);
+
+      ~orbitCamera();
+
+      glm::mat4 projection(float aspect, float alpha = 1.0f) const;
+  };
 
 }
 
