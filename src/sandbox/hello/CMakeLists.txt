@@ -28,6 +28,7 @@ else()
 target_link_libraries(hello
       ${BULLET_LIBRARIES}
       ${SDL2_LIBRARY}
+      ${SDL2_IMAGE_LIBRARY}
       ${GLEW_LIBRARY}
       ${OPENGL_LIBRARIES}
     )
