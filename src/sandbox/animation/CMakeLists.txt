@@ -9,8 +9,6 @@ target_link_libraries(animation
 if(DEFINED ENV{EMSCRIPTEN} AND EMSCRIPTEN_ENABLED)
   set(EMSCRIPTEN_FLAGS
       "-s USE_SDL=2"
-      "-s USE_SDL_IMAGE=2"
-      "-s SDL2_IMAGE_FORMATS='[\"png\"]'"
       "-s USE_BULLET=1"
      )
   string (REPLACE ";" " " EMSCRIPTEN_FLAGS "${EMSCRIPTEN_FLAGS}")

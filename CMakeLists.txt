@@ -62,7 +62,6 @@ else()
   include_directories( SYSTEM ${BULLET_INCLUDE_DIRS} )
 
   include_directories( SYSTEM extern/glm )
-  include_directories( SYSTEM extern/stb_image)
 
   find_package( SDL2 REQUIRED )
   include_directories( SYSTEM ${SDL2_INCLUDE_DIR} )
@@ -81,5 +80,6 @@ else()
     message(STATUS "dir='${dir}'")
   endforeach()
 endif()
+include_directories( SYSTEM extern/stb_image)
 
 add_subdirectory("./src")
