@@ -1,6 +1,7 @@
 /*
- * Copyright (c) 2016 Jonathan Glines
+ * Copyright (c) 2016 Jonathan Glines, Galen Cochrane
  * Jonathan Glines <jonathan@glines.net>
+ * Galen Cochrane <galencochrane@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -21,9 +22,12 @@
  * IN THE SOFTWARE.
  */
 
-#include <SDL_image.h>
 #include <cstdio>
 #include <cstdlib>
+
+#define STB_IMAGE_IMPLEMENTATION
+#define STBI_ONLY_PNG
+#include "stb_image.h"
 
 #include "debug.h"
 #include "scene.h"
@@ -39,7 +43,6 @@ namespace ld2016 {
 
     // Initialize the graphics
     m_initSdl();
-    m_initSdlImage();
     m_initGl();
 
     // Initialize the graphics scene
@@ -52,9 +55,6 @@ namespace ld2016 {
 
     // TODO: Free GL resources
     // TODO: Free SDL resources
-
-    // Free SDL Image resources
-    IMG_Quit();
   }
 
   void Game::m_initSdl() {
@@ -75,15 +75,6 @@ namespace ld2016 {
       fprintf(stderr, "Failed to create SDL window: %s\n",
           SDL_GetError());
       exit(EXIT_FAILURE);
-    }
-  }
-
-  void Game::m_initSdlImage() {
-    static const int flags = IMG_INIT_PNG | IMG_INIT_JPG;
-    int success = IMG_Init(flags);
-    if ((success & flags) != flags) {
-      fprintf(stderr, "Failed to initialize PNG and JPEG support: %s\n",
-          IMG_GetError());
     }
   }
 

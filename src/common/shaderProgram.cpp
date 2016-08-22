@@ -24,6 +24,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <sstream>
+#include <cstring>
 
 #include "shaderProgram.h"
 
