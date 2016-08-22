@@ -56,6 +56,8 @@ namespace ld2016 {
       DECLARE_SHADER(point);
       /** Shader for drawing debugging lines. */
       DECLARE_SHADER(wireframe);
+      /** Shader for drawing textures */
+      DECLARE_SHADER(texture);
   };
 }
 

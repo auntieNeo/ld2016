@@ -95,4 +95,12 @@ namespace ld2016 {
 #include "assets_shaders_glsl_wireframe.frag.c"
 #endif
   DEFINE_SHADER(wireframe)
+#ifdef __EMSCRIPTEN__
+#include "assets_shaders_webgl_texture.vert.c"
+#include "assets_shaders_webgl_texture.frag.c"
+#else
+#include "assets_shaders_glsl_texture.vert.c"
+#include "assets_shaders_glsl_texture.frag.c"
+#endif
+  DEFINE_SHADER(texture)
 }
