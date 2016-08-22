@@ -23,7 +23,7 @@
  */
 
 #include "wasdCamera.h"
-
+#include <algorithm>
 #define CAMERA_MAX_VELOCITY 0.00001f
 #define CAMERA_ACCELERATION 0.0001f
 #define CAMERA_FRICTION_INVERSE 10000.f     // less is more
@@ -129,12 +129,12 @@ namespace ld2016 {
   void WasdCamera::handleKeyState(float dt) {
     // Get current keyboard state and apply actions accordingly
     const Uint8 *keyStates = SDL_GetKeyboardState(NULL);
-    #define DO_ON_KEYS(action, keys...) if(anyPressed(keyStates, keys)) { action; }
+    #define DO_ON_KEYS(action, ...) if(anyPressed(keyStates, __VA_ARGS__)) { action; }
     DO_ON_KEYS(m_accel += glm::vec3(0.0f, 0.0f, -1.0f), SDL_SCANCODE_W, SDL_SCANCODE_UP)
     DO_ON_KEYS(m_accel += glm::vec3(0.0f, 0.0f, 1.0f), SDL_SCANCODE_S, SDL_SCANCODE_DOWN)
     DO_ON_KEYS(m_accel += glm::vec3(-1.0f, 0.0f, 0.0f), SDL_SCANCODE_A, SDL_SCANCODE_LEFT)
     DO_ON_KEYS(m_accel += glm::vec3(1.0f, 0.0f, 0.0f), SDL_SCANCODE_D, SDL_SCANCODE_RIGHT)
-    DO_ON_KEYS(m_accel += glm::vec3(0.0f, -1.0f, 0.0f), SDL_SCANCODE_LCTRL)
+    DO_ON_KEYS(m_accel += glm::vec3(0.0f, -1.0f, 0.0f), SDL_SCANCODE_LCTRL, SDL_SCANCODE_LSHIFT)
     DO_ON_KEYS(m_accel += glm::vec3(0.0f, 1.0f, 0.0f), SDL_SCANCODE_SPACE)
     #undef DO_ON_KEYS
   }

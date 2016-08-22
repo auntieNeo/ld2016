@@ -1,3 +1,5 @@
+precision mediump float;
+
 attribute vec3 vertPosition;
 attribute vec3 vertNormal;
 

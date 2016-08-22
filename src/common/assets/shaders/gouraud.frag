@@ -1,6 +1,6 @@
-#version 130
+precision mediump float;
 
-flat in vec3 color;
+varying vec3 color;
 
 // TODO: Write a function for Phong lighting
 

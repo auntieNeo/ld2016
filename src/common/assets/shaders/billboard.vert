@@ -1,14 +1,11 @@
-#version 130
+precision mediump float;
 
-attribute vec3 vertColor;
 attribute vec3 vertPosition;
+attribute vec2 vertTexCoord;
 
 uniform mat4 modelView;
 uniform mat4 projection;
 
-varying vec3 color;
-
 void main() {
   gl_Position = projection * modelView * vec4(vertPosition, 1.0);
-  color = vertColor;
 }
