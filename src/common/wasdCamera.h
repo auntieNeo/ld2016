@@ -40,6 +40,22 @@ namespace ld2016 {
       std::map<SDL_Scancode, bool> m_depressed;
       glm::vec3 m_accel, m_vel;
 
+      /**
+       * Reads keyboard state instantaneously and modifies acceleration vector accordingly
+       *
+       * \param dt The time in seconds between the last tick and the current
+       * tick.
+       */
+      void handleKeyState(float dt);
+
+      /**
+       * Applies acceleration vector and other effect to velocity
+       *
+       * \param dt The time in seconds between the last tick and the current
+       * tick.
+       */
+      void updateVelocity(float dt);
+
     public:
       /**
        * Constructs a WasdCamera object. The WASD camera does not expose any
