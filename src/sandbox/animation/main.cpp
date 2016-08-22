@@ -1,6 +1,7 @@
 /*
- * Copyright (c) 2016 Jonathan Glines
+ * Copyright (c) 2016 Jonathan Glines, Galen Cochrane
  * Jonathan Glines <jonathan@glines.net>
+ * Galen Cochrane <galencochrane@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -73,6 +74,63 @@ class AnimationDemo : public Game {
             glm::vec3(1.0f, (float)i * delta, 0.0f),
             glm::vec3(1.0f, 0.0f, 1.0f));
       }
+
+      Debug::drawLine(
+          glm::vec3(10 * delta, 0.f, 4.f),
+          glm::vec3(11 * delta, 0.f, 2.f),
+          glm::vec3(0.f, 1.f, 0.f));
+      Debug::drawLine(
+          glm::vec3(11 * delta, 0.f, 2.f),
+          glm::vec3(12 * delta, 0.f, 4.f),
+          glm::vec3(0.f, 1.f, 0.f));
+
+      Debug::drawLine(
+          glm::vec3(13 * delta, 0.f, 2.f),
+          glm::vec3(13 * delta, 0.f, 4.f),
+          glm::vec3(0.f, 1.f, 0.f));
+
+      Debug::drawLine(
+          glm::vec3(14 * delta, 0.f, 2.f),
+          glm::vec3(14 * delta, 0.f, 4.f),
+          glm::vec3(0.f, 1.f, 0.f));
+      Debug::drawLine(
+          glm::vec3(14 * delta, 0.f, 4.f),
+          glm::vec3(15 * delta, 0.f, 3.5f),
+          glm::vec3(0.f, 1.f, 0.f));
+      Debug::drawLine(
+          glm::vec3(15 * delta, 0.f, 3.5f),
+          glm::vec3(14 * delta, 0.f, 3.f),
+          glm::vec3(0.f, 1.f, 0.f));
+      Debug::drawLine(
+          glm::vec3(14 * delta, 0.f, 3.f),
+          glm::vec3(15 * delta, 0.f, 2.f),
+          glm::vec3(0.f, 1.f, 0.f));
+
+      Debug::drawLine(
+          glm::vec3(16 * delta, 0.f, 2.f),
+          glm::vec3(16 * delta, 0.f, 4.f),
+          glm::vec3(0.f, 1.f, 0.f));
+      Debug::drawLine(
+          glm::vec3(16 * delta, 0.f, 2.f),
+          glm::vec3(17 * delta, 0.f, 2.f),
+          glm::vec3(0.f, 1.f, 0.f));
+      Debug::drawLine(
+          glm::vec3(17 * delta, 0.f, 2.f),
+          glm::vec3(17 * delta, 0.f, 4.f),
+          glm::vec3(0.f, 1.f, 0.f));
+
+      Debug::drawLine(
+          glm::vec3(19 * delta, 0.f, 4.f),
+          glm::vec3(18 * delta, 0.f, 3.3f),
+          glm::vec3(0.f, 1.f, 0.f));
+      Debug::drawLine(
+          glm::vec3(18 * delta, 0.f, 3.3f),
+          glm::vec3(19 * delta, 0.f, 2.6f),
+          glm::vec3(0.f, 1.f, 0.f));
+      Debug::drawLine(
+          glm::vec3(19 * delta, 0.f, 2.6f),
+          glm::vec3(18 * delta, 0.f, 2.f),
+          glm::vec3(0.f, 1.f, 0.f));
     }
 };
 
