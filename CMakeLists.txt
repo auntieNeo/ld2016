@@ -60,7 +60,9 @@ if(DEFINED ENV{EMSCRIPTEN} AND EMSCRIPTEN_ENABLED)
 else()
   find_package( Bullet REQUIRED )
   include_directories( SYSTEM ${BULLET_INCLUDE_DIRS} )
+
   include_directories( SYSTEM extern/glm )
+  include_directories( SYSTEM extern/stb_image)
 
   find_package( SDL2 REQUIRED )
   include_directories( SYSTEM ${SDL2_INCLUDE_DIR} )
@@ -73,9 +75,6 @@ else()
 
   find_package( ASSIMP REQUIRED )
   include_directories( SYSTEM ${ASSIMP_INCLUDE_DIR} )
-
-  find_package( SDL2_Image REQUIRED )
-  include_directories( SYSTEM ${SDL2_IMAGE_INCLUDE_DIR} )
 
   get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
   foreach(dir ${dirs})

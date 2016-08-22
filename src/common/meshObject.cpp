@@ -1,6 +1,7 @@
 /*
- * Copyright (c) 2016 Jonathan Glines
+ * Copyright (c) 2016 Jonathan Glines, Galen Cochrane
  * Jonathan Glines <jonathan@glines.net>
+ * Galen Cochrane <galencochrane@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -21,11 +22,11 @@
  * IN THE SOFTWARE.
  */
 
-#include <SDL_image.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 #include <glm/gtc/type_ptr.hpp>
+#include "stb_image.h"
 
 #include "glError.h"
 #include "shaderProgram.h"
@@ -136,13 +137,10 @@ namespace ld2016 {
   }
 
   void MeshObject::m_loadTexture(const std::string &textureFile) {
-    // Load the texture from file using SDL Image
-    SDL_Surface *image;
-    image = IMG_Load(textureFile.c_str());
-    if (!image) {
-      fprintf(stderr, "Failed to load texture file '%s': %s\n",
-          textureFile.c_str(),
-          IMG_GetError());
+    int x, y, n;
+    uint8_t* data = stbi_load(textureFile.c_str(), &x, &y, &n, 0);
+    if (!data) {
+      fprintf(stderr, "Failed to load texture file '%s'.\n", textureFile.c_str());
     }
     // Create the texture object in the GL
     glGenTextures(1, &m_texture);
@@ -154,19 +152,19 @@ namespace ld2016 {
         GL_TEXTURE_2D,  // target
         0,  // level
         GL_RGBA,  // internal format
-        image->w,  // width
-        image->h,  // height
+        x,  // width
+        y,  // height
         0,  // border
         GL_RGBA,  // format
         GL_UNSIGNED_BYTE,  // type
-        image->pixels  // data
+        data  // data
         );
     FORCE_ASSERT_GL_ERROR();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     FORCE_ASSERT_GL_ERROR();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     FORCE_ASSERT_GL_ERROR();
-    SDL_FreeSurface(image);
+    stbi_image_free(data);
   }
 
   void MeshObject::m_drawSurface(
