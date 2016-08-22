@@ -1,4 +1,4 @@
-#version 130
+precision mediump float;
 
 attribute vec3 vertColor;
 attribute vec3 vertPosition;

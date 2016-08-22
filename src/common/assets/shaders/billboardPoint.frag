@@ -1,4 +1,4 @@
-#version 130
+precision mediump float;
 
 uniform vec3 color;
 

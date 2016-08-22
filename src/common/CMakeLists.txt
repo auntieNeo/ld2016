@@ -21,6 +21,8 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 if(DEFINED ENV{EMSCRIPTEN} AND EMSCRIPTEN_ENABLED)
   set(EMSCRIPTEN_FLAGS
       "-s USE_SDL=2"
+      "-s USE_SDL_IMAGE=2"
+      "-s SDL2_IMAGE_FORMATS='[\"png\"]'"
      )
   string (REPLACE ";" " " EMSCRIPTEN_FLAGS "${EMSCRIPTEN_FLAGS}")
   set_target_properties(common PROPERTIES
@@ -40,12 +42,12 @@ foreach(shader ${shaders})
   file(RELATIVE_PATH shader_rel "${CMAKE_CURRENT_SOURCE_DIR}" "${shader}")
   string(REPLACE "/" "_" shader_target "${shader_rel}.c")
   get_filename_component(shader_dir "${shader_rel}" DIRECTORY)
-  add_custom_target("${shader_target}"
+  add_custom_target("s_${shader_target}"
       COMMAND xxd -include ${shader_rel} > "${CMAKE_CURRENT_BINARY_DIR}/${shader_target}"
       DEPENDS "${shader}"
       WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
       )
   add_dependencies(common
-      "${shader_target}"
+      "s_${shader_target}"
       )
 endforeach()

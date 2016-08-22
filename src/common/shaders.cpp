@@ -25,11 +25,7 @@
 #include "shaders.h"
 
 namespace ld2016 {
-#ifdef __EMSCRIPTEN__
-#define SHADER_DIR assets_shaders_webgl
-#else
-#define SHADER_DIR assets_shaders_glsl
-#endif
+#define SHADER_DIR assets_shaders
 
 #define CAT(a, b) a ## b
 
@@ -47,60 +43,23 @@ namespace ld2016 {
   }
 #define DEFINE_SHADER(shader) DEFINE_SHADER_BASE(shader, SHADER_DIR)
 
-#ifdef __EMSCRIPTEN__
-#include "assets_shaders_webgl_billboard.vert.c"
-#include "assets_shaders_webgl_billboard.frag.c"
-#else
-#include "assets_shaders_glsl_billboard.vert.c"
-#include "assets_shaders_glsl_billboard.frag.c"
-#endif
-  DEFINE_SHADER(billboard)
-#ifdef __EMSCRIPTEN__
-#include "assets_shaders_webgl_billboardPoint.vert.c"
-#include "assets_shaders_webgl_billboardPoint.frag.c"
-#else
-#include "assets_shaders_glsl_billboardPoint.vert.c"
-#include "assets_shaders_glsl_billboardPoint.frag.c"
-#endif
-  DEFINE_SHADER(billboardPoint)
-#ifdef __EMSCRIPTEN__
-#include "assets_shaders_webgl_gouraud.vert.c"
-#include "assets_shaders_webgl_gouraud.frag.c"
-#else
-#include "assets_shaders_glsl_gouraud.vert.c"
-#include "assets_shaders_glsl_gouraud.frag.c"
-#endif
-  DEFINE_SHADER(gouraud)
-#ifdef __EMSCRIPTEN__
-#include "assets_shaders_webgl_gouraudWinding.vert.c"
-#include "assets_shaders_webgl_gouraudWinding.frag.c"
-#else
-#include "assets_shaders_glsl_gouraudWinding.vert.c"
-#include "assets_shaders_glsl_gouraudWinding.frag.c"
-#endif
-  DEFINE_SHADER(gouraudWinding)
-#ifdef __EMSCRIPTEN__
-#include "assets_shaders_webgl_point.vert.c"
-#include "assets_shaders_webgl_point.frag.c"
-#else
-#include "assets_shaders_glsl_point.vert.c"
-#include "assets_shaders_glsl_point.frag.c"
-#endif
-  DEFINE_SHADER(point)
-#ifdef __EMSCRIPTEN__
-#include "assets_shaders_webgl_wireframe.vert.c"
-#include "assets_shaders_webgl_wireframe.frag.c"
-#else
-#include "assets_shaders_glsl_wireframe.vert.c"
-#include "assets_shaders_glsl_wireframe.frag.c"
-#endif
-  DEFINE_SHADER(wireframe)
-#ifdef __EMSCRIPTEN__
-#include "assets_shaders_webgl_texture.vert.c"
-#include "assets_shaders_webgl_texture.frag.c"
-#else
-#include "assets_shaders_glsl_texture.vert.c"
-#include "assets_shaders_glsl_texture.frag.c"
-#endif
-  DEFINE_SHADER(texture)
+#include "assets_shaders_billboard.vert.c"
+#include "assets_shaders_billboard.frag.c"
+DEFINE_SHADER(billboard)
+
+#include "assets_shaders_billboardPoint.vert.c"
+#include "assets_shaders_billboardPoint.frag.c"
+DEFINE_SHADER(billboardPoint)
+
+#include "assets_shaders_gouraud.vert.c"
+#include "assets_shaders_gouraud.frag.c"
+DEFINE_SHADER(gouraud)
+
+#include "assets_shaders_wireframe.vert.c"
+#include "assets_shaders_wireframe.frag.c"
+DEFINE_SHADER(wireframe)
+
+#include "assets_shaders_texture.vert.c"
+#include "assets_shaders_texture.frag.c"
+DEFINE_SHADER(texture)
 }
