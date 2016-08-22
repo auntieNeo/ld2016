@@ -21,44 +21,24 @@
  * IN THE SOFTWARE.
  */
 
-#include <cstdlib>
+#ifndef LD2016_CAMERAORBIT_H
+#define LD2016_CAMERAORBIT_H
 
-#ifdef __EMSCRIPTEN__
-#include <emscripten.h>
-#endif
+#include "../../common/camera.h"
 
-#include "../../common/game.h"
-#include "../../common/meshObject.h"
-#include "orbitCamera.h"
+namespace ld2016 {
 
-using namespace ld2016;
+  class orbitCamera : public Camera {
+      glm::vec3 position;
+      glm::quat orientation;
+    public:
+      orbitCamera(const glm::vec3 &position, const glm::quat &orientation);
 
-class HelloDemo : public Game {
-    std::shared_ptr<orbitCamera> camera;
-  public:
-    HelloDemo(int argc, char **argv, glm::vec3 &&position, glm::quat &&orientation)
-        : Game(argc, argv, "Animation Demo"),
-          camera(std::make_shared<orbitCamera>(position, orientation)) {
-      setCamera(camera);
-    }
-};
+      ~orbitCamera();
 
-void main_loop(void *instance) {
-  HelloDemo *demo = (HelloDemo *) instance;
-  demo->mainLoop();
+      glm::mat4 projection(float aspect, float alpha = 1.0f) const;
+  };
+
 }
 
-int main(int argc, char **argv) {
-  HelloDemo demo(argc, argv, glm::vec3(), glm::quat());
-
-#ifdef __EMSCRIPTEN__
-  emscripten_set_main_loop_arg(main_loop, (void*)&demo, 0, 1);
-#else
-  while (1) {
-    main_loop(&demo);
-    // TODO: Wait for VSync? Or should we poll input faster than that?
-  }
-#endif
-
-  return EXIT_SUCCESS;
-}
+#endif //LD2016_CAMERAORBIT_H

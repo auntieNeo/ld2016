@@ -1,6 +1,7 @@
 /*
- * Copyright (c) 2016 Jonathan Glines
+ * Copyright (c) 2016 Jonathan Glines, Galen Cochrane
  * Jonathan Glines <jonathan@glines.net>
+ * Galen Cochrane <galencochrane@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -39,6 +40,22 @@ namespace ld2016 {
     private:
       std::map<SDL_Scancode, bool> m_depressed;
       glm::vec3 m_accel, m_vel;
+
+      /**
+       * Reads keyboard state instantaneously and modifies acceleration vector accordingly
+       *
+       * \param dt The time in seconds between the last tick and the current
+       * tick.
+       */
+      void handleKeyState(float dt);
+
+      /**
+       * Applies acceleration vector and other effect to velocity
+       *
+       * \param dt The time in seconds between the last tick and the current
+       * tick.
+       */
+      void updateVelocity(float dt);
 
     public:
       /**

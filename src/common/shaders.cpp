@@ -58,4 +58,8 @@ DEFINE_SHADER(gouraud)
 #include "assets_shaders_wireframe.vert.c"
 #include "assets_shaders_wireframe.frag.c"
 DEFINE_SHADER(wireframe)
+
+#include "assets_shaders_texture.vert.c"
+#include "assets_shaders_texture.frag.c"
+DEFINE_SHADER(texture)
 }

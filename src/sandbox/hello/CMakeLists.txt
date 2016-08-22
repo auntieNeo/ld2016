@@ -1,6 +1,6 @@
 add_executable(hello
         main.cpp
-        cameraOrbit.cpp cameraOrbit.h
+        orbitCamera.cpp orbitCamera.h
         )
 target_link_libraries(hello
         common
@@ -28,6 +28,7 @@ else()
 target_link_libraries(hello
       ${BULLET_LIBRARIES}
       ${SDL2_LIBRARY}
+      ${SDL2_IMAGE_LIBRARY}
       ${GLEW_LIBRARY}
       ${OPENGL_LIBRARIES}
     )
