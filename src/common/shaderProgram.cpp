@@ -23,6 +23,7 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <sstream>
 
 #include "shaderProgram.h"
 
@@ -108,12 +109,20 @@ namespace ld2016 {
   GLuint ShaderProgram::m_compileShader(
       const char *code, int code_len, GLenum type)
   {
-    char *source;
+    std::stringstream ss;
+#ifndef __EMSCRIPTEN__
+    ss << "#version 100\n" << code;
+    code_len += strlen("#version 100\n");
+#endif
+
     GLint status;
 
     GLuint shader = glCreateShader(type);
 
-    glShaderSource(shader, 1, &code, &code_len);
+    std::string temp = ss.str();
+    const char* finalCode = temp.c_str();
+
+    glShaderSource(shader, 1, &finalCode, &code_len);
 
     glCompileShader(shader);
     glGetShaderiv(
@@ -134,8 +143,8 @@ namespace ld2016 {
           NULL,
           log);
       // FIXME: The shader path should be printed with this error
-      fprintf(stderr, "Error compiling shader: %s\n",
-          log);
+      fprintf(stderr, "Error compiling shader %s: %s\n",
+        finalCode, log);
       free(log);
       // FIXME: Maybe call something other than exit() here
       exit(EXIT_FAILURE);
