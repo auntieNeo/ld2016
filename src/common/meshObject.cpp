@@ -41,8 +41,7 @@ namespace ld2016 {
     // Load the mesh from file using assimp
     m_loadMesh(meshFile);
     // Load the texture from file using SDL2
-    
-    // m_loadTexture(textureFile);
+    m_loadTexture(textureFile);
   }
 
   MeshObject::~MeshObject() {
@@ -148,19 +147,18 @@ namespace ld2016 {
     // Create the texture object in the GL
     glGenTextures(1, &m_texture);
     FORCE_ASSERT_GL_ERROR();
-    glBindTexture(GL_TEXTURE_1D, m_texture);
+    glBindTexture(GL_TEXTURE_2D, m_texture);
     FORCE_ASSERT_GL_ERROR();
     // Copy the image to the GL
-    assert(image->format->BytesPerPixel == 4);
     glTexImage2D(
         GL_TEXTURE_2D,  // target
         0,  // level
-        GL_RGBA8,  // internal format
+        GL_RGBA,  // internal format
         image->w,  // width
         image->h,  // height
         0,  // border
         GL_RGBA,  // format
-        GL_UNSIGNED_INT_8_8_8_8,  // type
+        GL_UNSIGNED_BYTE,  // type
         image->pixels  // data
         );
     FORCE_ASSERT_GL_ERROR();
@@ -176,7 +174,7 @@ namespace ld2016 {
       const glm::mat4 &projection)
   {
     // Use a simple shader
-    auto shader = Shaders::gouraudShader();
+    auto shader = Shaders::textureShader();
     shader->use();
 
     // Prepare the uniform values
@@ -197,6 +195,20 @@ namespace ld2016 {
         );
     ASSERT_GL_ERROR();
 
+    /*
+    // Prepare the texture sampler
+    assert(shader->texture0() != -1);
+    glUniform1i(
+        shader->texture0(),  // location
+        0  // value
+        );
+    ASSERT_GL_ERROR();
+    glActiveTexture(GL_TEXTURE0);
+    ASSERT_GL_ERROR();
+    glBindTexture(GL_TEXTURE_2D, m_texture);
+    ASSERT_GL_ERROR();
+    */
+
     // Prepare the vertex attributes
     glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
     ASSERT_GL_ERROR();
@@ -212,6 +224,7 @@ namespace ld2016 {
         &(((MeshVertex *)0)->pos[0])  // pointer
         );
     ASSERT_GL_ERROR();
+    /*
     assert(shader->vertNormalLocation() != -1);
     glEnableVertexAttribArray(shader->vertNormalLocation());
     ASSERT_GL_ERROR();
@@ -222,6 +235,19 @@ namespace ld2016 {
         0,  // normalized
         sizeof(MeshVertex),  // stride
         &(((MeshVertex *)0)->norm[0])  // pointer
+        );
+    ASSERT_GL_ERROR();
+    */
+    assert(shader->vertTexCoordLocation() != -1);
+    glEnableVertexAttribArray(shader->vertTexCoordLocation());
+    ASSERT_GL_ERROR();
+    glVertexAttribPointer(
+        shader->vertTexCoordLocation(),  // index
+        2,  // size
+        GL_FLOAT,  // type
+        0,  // normalized
+        sizeof(MeshVertex),  // stride
+        &(((MeshVertex *)0)->tex[0])  // pointer
         );
     ASSERT_GL_ERROR();
 
