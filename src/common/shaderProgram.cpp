@@ -111,9 +111,10 @@ namespace ld2016 {
   {
     std::stringstream ss;
 #ifndef __EMSCRIPTEN__
-    ss << "#version 100\n" << code;
+    ss << "#version 100\n";
     code_len += strlen("#version 100\n");
 #endif
+    ss << code;
 
     GLint status;
 
