@@ -9,12 +9,12 @@
 
 namespace ld2016 {
 
-    class CameraOrbit : public Camera {
+    class orbitCamera : public Camera {
         glm::vec3 position;
         glm::quat orientation;
     public:
-        CameraOrbit(const glm::vec3 &position, const glm::quat &orientation);
-        ~CameraOrbit();
+        orbitCamera(const glm::vec3 &position, const glm::quat &orientation);
+        ~orbitCamera();
         glm::mat4 projection(float aspect, float alpha = 1.0f) const;
     };
 
