@@ -38,7 +38,6 @@ namespace ld2016 {
    */
   class WasdCamera : public PerspectiveCamera {
     private:
-      std::map<SDL_Scancode, bool> m_depressed;
       glm::vec3 m_accel, m_vel;
 
       /**
