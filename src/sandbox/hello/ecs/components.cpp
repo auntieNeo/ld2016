@@ -42,29 +42,6 @@ namespace ld2016 {
   COMP_DEFN_DEPN(CameraView, NONE);
   COMP_DEFN_DEPN(WasdControls, NONE);
 
-  /*template<>
-  componentMask Component<Existence>::requiredComps
-      = NONE;
-  template<>
-  componentMask Component<Position>::requiredComps
-      = NONE;
-  template<>
-  componentMask Component<LinearVel>::requiredComps
-      = POSITION;
-  template<>
-  componentMask Component<Orientation>::requiredComps
-      = NONE;
-  template<>
-  componentMask Component<AngularVel>::requiredComps
-      = ORIENTATION;
-  template<>
-  componentMask Component<CameraView>::requiredComps
-      = POSITION | ORIENTATION;
-  template<>
-  componentMask Component<WasdControls>::requiredComps
-      = POSITION | LINEARVEL | ORIENTATION | ANGULARVEL;*/
-
-
   #undef COMP_DEFN_REQD
   #undef COMP_DEFN_DEPN
 }

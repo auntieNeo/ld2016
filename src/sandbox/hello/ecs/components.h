@@ -28,7 +28,6 @@
 #include <glm/gtc/quaternion.hpp>
 
 namespace ld2016 {
-  void initializeInterComponentRequirements();
   template <typename Derived>
   struct Component {
     static compMask requiredComps;
@@ -39,6 +38,9 @@ namespace ld2016 {
   COMP_DECL(Existence) {
     compMask componentsPresent = NONE;
   };
+  /* TODO: https://codecraft.co/2014/11/25/variadic-macros-tricks/
+   * to get rid of ARGS_... defines
+   */
   #define ARGS_Position vec
   COMP_DECL(Position) {
     glm::vec3 vec;
@@ -68,27 +70,6 @@ namespace ld2016 {
     glm::vec3 accel;
   };
 
-  /*struct Existence : public Component<Existence> {
-    componentMask componentsPresent = NONE;
-  };
-  struct Position : public Component<Position> {
-    glm::vec3 vec;
-  };
-  struct LinearVel : public Component<LinearVel> {
-    glm::vec3 vec;
-  };
-  struct Orientation : public Component<Orientation> {
-    glm::quat quat;
-  };
-  struct AngularVel : public Component<AngularVel> {
-    glm::quat quat;
-  };
-  struct CameraView : public Component<CameraView> {
-    float fovy, near, far, aspect;
-  };
-  struct WasdControls : public Component<WasdControls> {
-    glm::vec3 accel;
-  };*/
   #undef COMP_DECL
 }
 

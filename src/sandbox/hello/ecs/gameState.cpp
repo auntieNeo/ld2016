@@ -21,7 +21,6 @@
  * IN THE SOFTWARE.
  */
 #include "gameState.h"
-#include <glm/glm.hpp>
 
 namespace ld2016 {
 
@@ -62,7 +61,6 @@ namespace ld2016 {
           CompOpReturn GameState::rem##comp(const entityId id) { remComp(comps_##comp, id, ENUM_##comp); }\
           CompOpReturn GameState::get##comp(const entityId id, comp** out) { getComp(comps_##comp, id, out); }
 
-  // TODO: https://codecraft.co/2014/11/25/variadic-macros-tricks/
   COMP_COLL_DEFN_NOARGS(Existence)
   COMP_COLL_DEFN(Position, glm::vec3 vec)
   COMP_COLL_DEFN(LinearVel, glm::vec3 vec)

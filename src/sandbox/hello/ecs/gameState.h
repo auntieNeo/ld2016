@@ -28,6 +28,7 @@
 #include "components.h"
 
 namespace ld2016 {
+
   #define COMP_COLL_DECL_NOARGS(comp) \
           KvMap<entityId, comp> comps_##comp;\
           CompOpReturn add##comp(const entityId id);\
@@ -38,7 +39,9 @@ namespace ld2016 {
           CompOpReturn add##comp(const entityId id, __VA_ARGS__);\
           CompOpReturn rem##comp(const entityId id);\
           CompOpReturn get##comp(const entityId id, comp** out);
+
   class GameState {
+
       COMP_COLL_DECL_NOARGS(Existence)
       COMP_COLL_DECL(Position, glm::vec3 vec)
       COMP_COLL_DECL(LinearVel, glm::vec3 vec)
@@ -56,6 +59,7 @@ namespace ld2016 {
       template<typename compType>
       CompOpReturn getComp(KvMap<entityId, compType>& coll, const entityId id, compType** out);
   };
+
   #undef COMP_COLL_DECL_NOARGS
   #undef COMP_COLL_DECL
 }
