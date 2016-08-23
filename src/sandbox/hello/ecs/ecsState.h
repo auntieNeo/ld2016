@@ -23,11 +23,21 @@
 #ifndef LD2016_ENTITIES_H
 #define LD2016_ENTITIES_H
 
-#include "ecsCoreAutoGen.h"
+#include "ecsAutoGen.h"
 #include "KvMap.h"
 #include "components.h"
 
 namespace ld2016 {
+
+  typedef uint32_t entityId;
+
+  enum CompOpReturn {
+    SUCCESS,
+    NONEXISTANT,
+    REDUNDANT,
+    PREREQ_FAIL,
+    INVALID_STATE,
+  };
 
   class EcsState {
 
@@ -53,8 +63,6 @@ namespace ld2016 {
       CompOpReturn getComp(KvMap<entityId, compType>& coll, const entityId id, compType** out);
   };
 
-//  #undef COMP_COLL_DECL_NOARGS
-  #undef COMP_COLL_DECL
 }
 
 #endif //LD2016_ENTITIES_H

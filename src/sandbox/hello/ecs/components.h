@@ -23,11 +23,13 @@
 #ifndef LD2016_ECS_H
 #define LD2016_ECS_H
 
-#include "ecsCoreAutoGen.h"
+#include "ecsAutoGen.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
 namespace ld2016 {
+
+  typedef uint32_t compMask;
 
   template <typename Derived>
   struct Component {
@@ -81,8 +83,6 @@ namespace ld2016 {
     glm::vec3 accel;
   };
 
-  #undef COMP_DECL
-  #undef GEN_COMP_ENUMS
 }
 
 #endif //LD2016_ECS_H

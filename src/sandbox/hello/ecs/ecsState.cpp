@@ -65,7 +65,4 @@ namespace ld2016 {
     return NONEXISTANT;
   }
 
-//  #undef COMP_COLL_DEFN_NOARGS
-  #undef COMP_COLL_DEFN
-
 }

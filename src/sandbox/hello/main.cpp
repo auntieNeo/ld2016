@@ -30,6 +30,7 @@
 #include "../../common/game.h"
 #include "../../common/meshObject.h"
 #include "orbitCamera.h"
+#include "ecs/ecsState.h"
 
 using namespace ld2016;
 
@@ -41,6 +42,10 @@ class HelloDemo : public Game {
           camera(std::make_shared<orbitCamera>(position, orientation)) {
       setCamera(camera);
     }
+};
+
+class EcsDemo {
+
 };
 
 void main_loop(void *instance) {

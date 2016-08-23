@@ -20,10 +20,12 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#ifndef LD2016_ECSCOREAUTOGENFOREACH_H
-#define LD2016_ECSCOREAUTOGENFOREACH_H
+#ifndef LD2016_TYPES_H
+#define LD2016_TYPES_H
 
-// Provides variadic argument count
+#include <stdint.h>
+
+  // Provides variadic argument count
 #define _GET_ARG_N(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, \
                   _19, _20, _21, _22, _23, _24, _25, _26, _27, _28, _29, _30, _31, _32, _33, _N, ...) _N
 
@@ -104,38 +106,39 @@
     _a14, _a14, _a12, _a12, _a10, _a10, _a8, _a8, _a6, _a6, _a4, _a4, _a2, _a2, _a0, _a0) \
     (action, ##__VA_ARGS__)*/
 
-/*#define _p0(action, ...)
-#define _p1(action, arg)      action(arg, 0)
-#define _p2(action, arg, ...) action(arg, 1) _p1(action, __VA_ARGS__)
-#define _p3(action, arg, ...) action(arg, 2) _p2(action, __VA_ARGS__)
-#define _p4(action, arg, ...) action(arg, 3) _p3(action, __VA_ARGS__)
-#define _p5(action, arg, ...) action(arg, 4) _p4(action, __VA_ARGS__)
-#define _p6(action, arg, ...) action(arg, 5) _p5(action, __VA_ARGS__)
-#define _p7(action, arg, ...) action(arg, 6) _p6(action, __VA_ARGS__)
-#define _p8(action, arg, ...) action(arg, 7) _p7(action, __VA_ARGS__)
-#define _p9(action, arg, ...) action(arg, 8) _p8(action, __VA_ARGS__)
-#define _p10(action, arg, ...) action(arg, 9) _p9(action, __VA_ARGS__)
-#define _p11(action, arg, ...) action(arg, 10) _p10(action, __VA_ARGS__)
-#define _p12(action, arg, ...) action(arg, 11) _p11(action, __VA_ARGS__)
-#define _p13(action, arg, ...) action(arg, 12) _p12(action, __VA_ARGS__)
-#define _p14(action, arg, ...) action(arg, 13) _p13(action, __VA_ARGS__)
-#define _p15(action, arg, ...) action(arg, 14) _p14(action, __VA_ARGS__)
-#define _p16(action, arg, ...) action(arg, 15) _p15(action, __VA_ARGS__)
-#define _p17(action, arg, ...) action(arg, 16) _p16(action, __VA_ARGS__)
-#define _p18(action, arg, ...) action(arg, 17) _p17(action, __VA_ARGS__)
-#define _p19(action, arg, ...) action(arg, 18) _p18(action, __VA_ARGS__)
-#define _p20(action, arg, ...) action(arg, 19) _p19(action, __VA_ARGS__)
-#define _p21(action, arg, ...) action(arg, 20) _p20(action, __VA_ARGS__)
-#define _p22(action, arg, ...) action(arg, 21) _p21(action, __VA_ARGS__)
-#define _p23(action, arg, ...) action(arg, 22) _p22(action, __VA_ARGS__)
-#define _p24(action, arg, ...) action(arg, 23) _p23(action, __VA_ARGS__)
-#define _p25(action, arg, ...) action(arg, 24) _p24(action, __VA_ARGS__)
-#define _p26(action, arg, ...) action(arg, 25) _p25(action, __VA_ARGS__)
-#define _p27(action, arg, ...) action(arg, 26) _p26(action, __VA_ARGS__)
-#define _p28(action, arg, ...) action(arg, 27) _p27(action, __VA_ARGS__)
-#define _p29(action, arg, ...) action(arg, 28) _p28(action, __VA_ARGS__)
-#define _p30(action, arg, ...) action(arg, 29) _p29(action, __VA_ARGS__)
-#define _p31(action, arg, ...) action(arg, 30) _p30(action, __VA_ARGS__)
-#define _p32(action, arg, ...) action(arg, 31) _p31(action, __VA_ARGS__)*/
+#define _GEN_COMP_ENUM(comp, i) ENUM_##comp = 1 << i,
+#define GEN_COMP_ENUMS(...) enum ComponentTypes { NONE = 0, ALL = -1, DO_FOR_EACH(_GEN_COMP_ENUM, __VA_ARGS__) };
 
-#endif //LD2016_ECSCOREAUTOGENFOREACH_H
+#define _GEN_ARG_NAME_NUMERIC(placeholder, i) , arg##i
+#define GEN_ARG_NAMES(...) DO_FOR_EACH(_GEN_ARG_NAME_NUMERIC, ##__VA_ARGS__)
+
+#define _GEN_ARG_NAME_TYPED(type, i) , type arg##i
+#define GEN_ARG_NAMES_TYPED(...) DO_FOR_EACH(_GEN_ARG_NAME_TYPED, ##__VA_ARGS__)
+
+/*#define COMP_COLL_DECL_NOARGS(comp) \
+        KvMap<entityId, comp> comps_##comp;\
+        CompOpReturn add##comp(const entityId id);\
+        CompOpReturn rem##comp(const entityId id);\
+        CompOpReturn get##comp(const entityId id, comp** out);*/
+#define _COMP_COLL_DECL(comp, ...) \
+        private: KvMap<entityId, comp> comps_##comp; public: \
+        CompOpReturn add##comp(const entityId id GEN_ARG_NAMES_TYPED(__VA_ARGS__));\
+        CompOpReturn rem##comp(const entityId id);\
+        CompOpReturn get##comp(const entityId id, comp** out);
+#define COMP_COLL_DECL(comp) _COMP_COLL_DECL(comp, SIG_##comp)
+
+/*#define _COMP_COLL_DEFN_NOARGS(comp) \
+        CompOpReturn EcsState::add##comp(const entityId id) { addComp(comps_##comp, id); }\
+        CompOpReturn EcsState::rem##comp(const entityId id) { remComp(comps_##comp, id, ENUM_##comp); }\
+        CompOpReturn EcsState::get##comp(const entityId id, comp** out) { getComp(comps_##comp, id, out); }*/
+#define _COMP_COLL_DEFN(comp, ...) \
+  CompOpReturn EcsState::add##comp(const entityId id GEN_ARG_NAMES_TYPED(__VA_ARGS__)) \
+                              { addComp(comps_##comp, id GEN_ARG_NAMES(__VA_ARGS__)); }\
+  CompOpReturn EcsState::rem##comp(const entityId id) { remComp(comps_##comp, id, ENUM_##comp); }\
+  CompOpReturn EcsState::get##comp(const entityId id, comp** out) { getComp(comps_##comp, id, out); }
+#define COMP_COLL_DEFN(comp) _COMP_COLL_DEFN(comp, SIG_##comp)
+
+#define COMP_DEFN_REQD(comp, flags) template<> compMask Component<comp>::requiredComps = flags
+#define COMP_DEFN_DEPN(comp, flags) template<> compMask Component<comp>::dependentComps = flags
+
+#endif //LD2016_TYPES_H
