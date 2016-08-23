@@ -23,9 +23,24 @@
 #include "components.h"
 
 namespace ld2016 {
-  #define COMP_DEFN_REQD(comp, flags) template<> compMask Component<comp>::requiredComps = flags
-  #define COMP_DEFN_DEPN(comp, flags) template<> compMask Component<comp>::dependentComps = flags
 
+  /*
+   * The following macros describe the dependency relationships between components.The first block enumerates for
+   * a given component what other components are required for it to exist. For example, it makes no sense for an
+   * entity to posses linear velocity without first having a position. This relationship is important when you're
+   * adding new components to the world. Notice that all components list the existence component as a requirement.
+   *
+   * The second set of macros describe the inverse relationships, or for a given component, which other components
+   * list it as a required component. This relationship is examined upon the deletion of a component. Notice that
+   * the existence component is a lists 'ALL' as its dependents.
+   *
+   * TODO: Add entries to both sections below for any new component types you create.
+   * The generated format for any component enumerator is 'ENUM_[component_type].' As seen below, the ALL and NONE
+   * enumerators also exist. Since these are bit flags, you can probably guess that NONE is zero and ALL is
+   * unsigned -1, or in other words, ALL has all the bits turned on.
+   *
+   * Other files you will need to modify: ecsState.h, ecsState.cpp, components.h
+   */
   COMP_DEFN_REQD(Existence, NONE);
   COMP_DEFN_REQD(Position, ENUM_Existence);
   COMP_DEFN_REQD(LinearVel, ENUM_Existence | ENUM_Position);
@@ -41,6 +56,21 @@ namespace ld2016 {
   COMP_DEFN_DEPN(AngularVel, ENUM_WasdControls);
   COMP_DEFN_DEPN(CameraView, NONE);
   COMP_DEFN_DEPN(WasdControls, NONE);
+
+  /*
+   * The following area is for the definitions of any component methods you create. Make sure that constructor
+   * parameters match the 'SIG_[component_type]' define you provided with the declaration of the component.
+   * TODO: Add any and all component member method definitions here.
+   * NOTE: Generally there shouldn't be methods except the constructor. Game logic ought to go in the systems instead.
+   * Sometimes its convenient to put helper methods in some components, however (like matrix calculators in a camera
+   * component or something). It's up to coder discretion.
+   */
+  Position::Position(glm::vec3 vec) : vec(vec) {}
+  LinearVel::LinearVel(glm::vec3 vec) : vec(vec) {}
+  Orientation::Orientation(glm::quat quat) : quat(quat) {}
+  AngularVel::AngularVel(glm::quat quat) : quat(quat) {}
+  CameraView::CameraView(float fovy, float near, float far, float aspect)
+      : fovy(fovy), near(near), far(far), aspect(aspect) {}
 
   #undef COMP_DEFN_REQD
   #undef COMP_DEFN_DEPN

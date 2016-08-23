@@ -23,54 +23,66 @@
 #ifndef LD2016_ECS_H
 #define LD2016_ECS_H
 
-#include "metaEcs.h"
+#include "ecsCoreAutoGen.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
 namespace ld2016 {
+
   template <typename Derived>
   struct Component {
     static compMask requiredComps;
     static compMask dependentComps;
   };
-  #define COMP_DECL(name) struct name : public Component<name>
 
-  COMP_DECL(Existence) {
+  /*
+   * The following macro generates bit flag enumerations for all component types.
+   * TODO: Add an entry below for any new component types you create.
+   * Other files you will need to modify: ecsState.h, ecsState.cpp, components.cpp
+   */
+  GEN_COMP_ENUMS(Existence, Position, LinearVel, Orientation, AngularVel, CameraView, WasdControls)
+
+  /*
+   * The following are component type declarations.
+   * TODO: Declare new components here and be sure to define 'SIG_[component_type]' as the constructor parameter types.
+   * NOTE: Just follow the examples of the others.
+   */
+  #define SIG_Existence
+  struct Existence : public Component<Existence> {
     compMask componentsPresent = NONE;
   };
-  /* TODO: https://codecraft.co/2014/11/25/variadic-macros-tricks/
-   * to get rid of ARGS_... defines
-   */
-  #define ARGS_Position vec
-  COMP_DECL(Position) {
+  #define SIG_Position glm::vec3
+  struct Position : public Component<Position> {
     glm::vec3 vec;
-    Position(glm::vec3 vec) : vec(vec) {}
+    Position(glm::vec3 vec);
   };
-  #define ARGS_LinearVel vec
-  COMP_DECL(LinearVel) {
+  #define SIG_LinearVel glm::vec3
+  struct LinearVel : public Component<LinearVel> {
     glm::vec3 vec;
-    LinearVel(glm::vec3 vec) : vec(vec) {}
+    LinearVel(glm::vec3 vec);
   };
-  #define ARGS_Orientation quat
-  COMP_DECL(Orientation) {
+  #define SIG_Orientation glm::quat
+  struct Orientation : public Component<Orientation> {
     glm::quat quat;
-    Orientation(glm::quat quat) : quat(quat) {}
+    Orientation(glm::quat quat);
   };
-  #define ARGS_AngularVel quat
-  COMP_DECL(AngularVel) {
+  #define SIG_AngularVel glm::quat
+  struct AngularVel : public Component<AngularVel> {
     glm::quat quat;
-    AngularVel(glm::quat quat) : quat(quat) {}
+    AngularVel(glm::quat quat);
   };
-  #define ARGS_CameraView fovy, near, far, aspect
-  COMP_DECL(CameraView) {
+  #define SIG_CameraView float, float, float, float
+  struct CameraView : public Component<CameraView> {
     float fovy, near, far, aspect;
-    CameraView(float fovy, float near, float far, float aspect) : fovy(fovy), near(near), far(far), aspect(aspect) {}
+    CameraView(float fovy, float near, float far, float aspect);
   };
-  COMP_DECL(WasdControls) {
+  #define SIG_WasdControls
+  struct WasdControls : public Component<WasdControls> {
     glm::vec3 accel;
   };
 
   #undef COMP_DECL
+  #undef GEN_COMP_ENUMS
 }
 
 #endif //LD2016_ECS_H

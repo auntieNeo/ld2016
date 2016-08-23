@@ -20,19 +20,32 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#include "gameState.h"
+#include "ecsState.h"
 
 namespace ld2016 {
 
+  /*
+   * The following macros DEFINE collections of each type of component and methods to access and modify them.
+   * TODO: Add an entry below for any new component types you create.
+   * Other files you will need to modify: ecsState.h, components.h, components.cpp
+   */
+  COMP_COLL_DEFN(Existence)
+  COMP_COLL_DEFN(Position)
+  COMP_COLL_DEFN(LinearVel)
+  COMP_COLL_DEFN(Orientation)
+  COMP_COLL_DEFN(AngularVel)
+  COMP_COLL_DEFN(CameraView)
+  COMP_COLL_DEFN(WasdControls)
+
   template<typename compType, typename ... types>
-  CompOpReturn GameState::addComp(KvMap<entityId, compType>& coll, const entityId id, const types &... args) {
+  CompOpReturn EcsState::addComp(KvMap<entityId, compType>& coll, const entityId id, const types &... args) {
     if ( ! (coll.emplace(std::piecewise_construct, std::forward_as_tuple(id), std::forward_as_tuple(args...)))) {
       return REDUNDANT;
     }
     return SUCCESS;
   }
   template<typename compType>
-  CompOpReturn GameState::remComp(KvMap<entityId, compType>& coll, const entityId id, ComponentTypes flag) {
+  CompOpReturn EcsState::remComp(KvMap<entityId, compType>& coll, const entityId id, ComponentTypes flag) {
     if (coll.count(id)) {
       if (comps_Existence.count(id)) {
         coll.erase(id);
@@ -44,7 +57,7 @@ namespace ld2016 {
     return NONEXISTANT;
   }
   template<typename compType>
-  CompOpReturn GameState::getComp(KvMap<entityId, compType> &coll, const entityId id, compType** out) {
+  CompOpReturn EcsState::getComp(KvMap<entityId, compType> &coll, const entityId id, compType** out) {
     if (coll.count(id)) {
       *out = &coll.at(id);
       return SUCCESS;
@@ -52,24 +65,7 @@ namespace ld2016 {
     return NONEXISTANT;
   }
 
-  #define COMP_COLL_DEFN_NOARGS(comp) \
-          CompOpReturn GameState::add##comp(const entityId id) { addComp(comps_##comp, id); }\
-          CompOpReturn GameState::rem##comp(const entityId id) { remComp(comps_##comp, id, ENUM_##comp); }\
-          CompOpReturn GameState::get##comp(const entityId id, comp** out) { getComp(comps_##comp, id, out); }
-  #define COMP_COLL_DEFN(comp, ...) \
-          CompOpReturn GameState::add##comp(const entityId id, __VA_ARGS__) { addComp(comps_##comp, id, ARGS_##comp); }\
-          CompOpReturn GameState::rem##comp(const entityId id) { remComp(comps_##comp, id, ENUM_##comp); }\
-          CompOpReturn GameState::get##comp(const entityId id, comp** out) { getComp(comps_##comp, id, out); }
-
-  COMP_COLL_DEFN_NOARGS(Existence)
-  COMP_COLL_DEFN(Position, glm::vec3 vec)
-  COMP_COLL_DEFN(LinearVel, glm::vec3 vec)
-  COMP_COLL_DEFN(Orientation, glm::quat quat)
-  COMP_COLL_DEFN(AngularVel, glm::quat quat)
-  COMP_COLL_DEFN(CameraView, float fovy, float near, float far, float aspect)
-  COMP_COLL_DEFN_NOARGS(WasdControls)
-
-  #undef COMP_COLL_DEFN_NOARGS
+//  #undef COMP_COLL_DEFN_NOARGS
   #undef COMP_COLL_DEFN
 
 }

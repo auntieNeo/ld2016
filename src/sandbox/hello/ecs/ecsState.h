@@ -20,33 +20,41 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#ifndef LD2016_TYPES_H
-#define LD2016_TYPES_H
+#ifndef LD2016_ENTITIES_H
+#define LD2016_ENTITIES_H
 
-#include <stdint.h>
+#include "ecsCoreAutoGen.h"
+#include "KvMap.h"
+#include "components.h"
 
 namespace ld2016 {
-  typedef uint32_t entityId;
-  typedef uint32_t compMask;
 
-  enum ComponentTypes {
-    NONE              = 0     ,
-    ALL               = -1    ,
-    ENUM_Existence    = 1 << 0,
-    ENUM_Position     = 1 << 1,
-    ENUM_LinearVel    = 1 << 2,
-    ENUM_Orientation  = 1 << 3,
-    ENUM_AngularVel   = 1 << 4,
-    ENUM_CameraView   = 1 << 5,
-    ENUM_WasdControls = 1 << 6,
+  class EcsState {
+
+      /*
+       * The following macros DECLARE collections of each type of component and methods to access and modify them.
+       * TODO: Add an entry below for any new component types you create.
+       * Other files you will need to modify: ecsState.cpp, components.h, components.cpp
+       */
+      COMP_COLL_DECL(Existence)
+      COMP_COLL_DECL(Position)
+      COMP_COLL_DECL(LinearVel)
+      COMP_COLL_DECL(Orientation)
+      COMP_COLL_DECL(AngularVel)
+      COMP_COLL_DECL(CameraView)
+      COMP_COLL_DECL(WasdControls)
+
+    private:
+      template<typename compType, typename ... types>
+      CompOpReturn addComp(KvMap<entityId, compType>& coll, const entityId id, const types &... args);
+      template<typename compType>
+      CompOpReturn remComp(KvMap<entityId, compType>& coll, const entityId id, ComponentTypes flag);
+      template<typename compType>
+      CompOpReturn getComp(KvMap<entityId, compType>& coll, const entityId id, compType** out);
   };
-  enum CompOpReturn {
-    SUCCESS,
-    NONEXISTANT,
-    REDUNDANT,
-    PREREQ_FAIL,
-    INVALID_STATE,
-  };
+
+//  #undef COMP_COLL_DECL_NOARGS
+  #undef COMP_COLL_DECL
 }
 
-#endif //LD2016_TYPES_H
+#endif //LD2016_ENTITIES_H
