@@ -95,13 +95,18 @@ namespace ld2016 {
       entityId nextId = 0;
 
     public:
+      /**
+       * Creates a new entity (specifically an Existence component]
+       * @param newId is set to the id of the newly created entity, or 0 if unsuccessful.
+       * @return SUCCESS or MAX_ID_REACHED if the maximum value of the entityId type has been reached
+       */
       CompOpReturn createEntity(entityId *newId);
 
     private:
       template<typename compType, typename ... types>
       CompOpReturn addComp(KvMap<entityId, compType>& coll, const entityId id, const types &... args);
       template<typename compType>
-      CompOpReturn remComp(KvMap<entityId, compType>& coll, const entityId id, ComponentTypes flag);
+      CompOpReturn remComp(KvMap<entityId, compType>& coll, const entityId id);
       template<typename compType>
       CompOpReturn getComp(KvMap<entityId, compType>& coll, const entityId id, compType** out);
   };

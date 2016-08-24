@@ -20,6 +20,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
+#include <limits>
 #include "ecsState.h"
 
 namespace ld2016 {
@@ -39,8 +40,12 @@ namespace ld2016 {
 
   CompOpReturn EcsState::createEntity(entityId *newId) {
     // TODO: check against max entityId value
-    Existence* existence = &comps_Existence[++nextId];
-    existence->turnOnFlags(Existence::thisCompMask);
+    if (nextId == std::numeric_limits<entityId>::max() || ++nextId == std::numeric_limits<entityId>::max()) {
+      *newId = 0;
+      return MAX_ID_REACHED;
+    }
+    Existence* existence = &comps_Existence[nextId];
+    existence->turnOnFlags(Existence::flag);
     *newId = nextId;
     return SUCCESS;
   }
@@ -51,7 +56,7 @@ namespace ld2016 {
       Existence* existence = &comps_Existence.at(id);
       if (existence->passesPrerequisitesForAddition(compType::requiredComps)) {
         if (coll.emplace(std::piecewise_construct, std::forward_as_tuple(id), std::forward_as_tuple(args...))) {
-          existence->turnOnFlags(compType::thisCompMask);
+          existence->turnOnFlags(compType::flag);
           return SUCCESS;
         }
         return REDUNDANT;
@@ -61,13 +66,13 @@ namespace ld2016 {
     return NONEXISTENT_ENT;
   }
   template<typename compType>
-  CompOpReturn EcsState::remComp(KvMap<entityId, compType>& coll, const entityId id, ComponentTypes flag) {
+  CompOpReturn EcsState::remComp(KvMap<entityId, compType>& coll, const entityId id) {
     if (coll.count(id)) {
       if (comps_Existence.count(id)) {
         Existence* existence = &comps_Existence.at(id);
         if (existence->passesDependenciesForRemoval(compType::dependentComps)) {
           coll.erase(id);
-          comps_Existence.at(id).componentsPresent &= ~flag;
+          comps_Existence.at(id).componentsPresent &= ~compType::flag;
           return SUCCESS;
         }
         return DEPEND_FAIL;

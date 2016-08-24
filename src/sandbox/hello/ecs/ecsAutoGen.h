@@ -134,12 +134,12 @@
 #define _COMP_COLL_DEFN(comp, ...) \
   CompOpReturn EcsState::add##comp(const entityId id GEN_ARG_NAMES_TYPED(__VA_ARGS__)) \
                               { addComp(comps_##comp, id GEN_ARG_NAMES(__VA_ARGS__)); }\
-  CompOpReturn EcsState::rem##comp(const entityId id) { remComp(comps_##comp, id, ENUM_##comp); }\
+  CompOpReturn EcsState::rem##comp(const entityId id) { remComp(comps_##comp, id); }\
   CompOpReturn EcsState::get##comp(const entityId id, comp** out) { getComp(comps_##comp, id, out); }
 #define COMP_COLL_DEFN(comp) _COMP_COLL_DEFN(comp, SIG_##comp)
 
 #define COMP_DEFN_REQD(comp, flags) template<> compMask Component<comp>::requiredComps = flags; \
-                                    template<> compMask Component<comp>::thisCompMask = ENUM_##comp
+                                    template<> compMask Component<comp>::flag = ENUM_##comp
 #define COMP_DEFN_DEPN(comp, flags) template<> compMask Component<comp>::dependentComps = flags
 
 #endif //LD2016_TYPES_H

@@ -34,9 +34,7 @@ namespace ld2016 {
   {
     private:
       std::string name;
-      bool escape = false;
       bool paused = false;
-      bool pauseConfirmed = false;
       Derived_System& sys();
 
     protected:
@@ -90,7 +88,6 @@ namespace ld2016 {
   void System<Derived_System>::resume(){
     if (paused){
       paused = false;
-      pauseConfirmed = false;
     }
   }
   template<typename Derived_System>

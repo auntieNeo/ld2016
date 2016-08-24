@@ -35,7 +35,7 @@ namespace ld2016 {
   struct Component {
     static compMask requiredComps;
     static compMask dependentComps;
-    static compMask thisCompMask;
+    static compMask flag;
   };
 
   /*
