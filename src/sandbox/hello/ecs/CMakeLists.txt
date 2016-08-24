@@ -1,4 +1,5 @@
 add_library(ecs STATIC
-        components.cpp
+        ecsComponents.cpp
         ecsState.cpp
+        ecsHelpers.cpp
         )

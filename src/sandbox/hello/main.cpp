@@ -27,34 +27,80 @@
 #include <emscripten.h>
 #endif
 
+#include "../../common/debug.h"
+#include "../../common/scene.h"
+#include "../../common/wasdCamera.h"
 #include "../../common/game.h"
 #include "../../common/meshObject.h"
-#include "orbitCamera.h"
 #include "ecs/ecsState.h"
+#include "ecs/ecsHelpers.h"
 
 using namespace ld2016;
 
-class HelloDemo : public Game {
-    std::shared_ptr<orbitCamera> camera;
+class EcsDemo : public Game {
+  private:
+    std::shared_ptr<WasdCamera> m_camera;
+    std::shared_ptr<MeshObject> m_mesh;
+    EcsState gameData;
   public:
-    HelloDemo(int argc, char **argv, glm::vec3 &&position, glm::quat &&orientation)
-        : Game(argc, argv, "Animation Demo"),
-          camera(std::make_shared<orbitCamera>(position, orientation)) {
-      setCamera(camera);
+    EcsDemo(int argc, char **argv)
+        : Game(argc, argv, "Entity Component Sytem Demo") {
+      // Populate the graphics scene
+      m_camera = std::shared_ptr<WasdCamera>(
+          new WasdCamera(
+              80.0f * ((float) M_PI / 180.0f),  // fovy
+              0.1f,  // near
+              100000.0f,  // far
+              glm::vec3(0.0f, 0.0f, 15.0f),  // position
+              glm::angleAxis(
+                  (float) M_PI / 4.0f,
+                  glm::vec3(1.0f, 0.0f, 0.0f))  // orientation
+          ));
+      this->scene()->addObject(m_camera);
+      this->setCamera(m_camera);
+      m_mesh = std::shared_ptr<MeshObject>(
+          new MeshObject(
+              "assets/models/sphere.dae",  // mesh
+              "assets/textures/rt_bunny.png"  // texture
+          ));
+      this->scene()->addObject(m_mesh);
+      float delta = 0.3f;
+      for (int i = 0; i < 100; ++i) {
+        Debug::drawLine(
+            glm::vec3((float) i * delta, 0.0f, 0.0f),
+            glm::vec3((float) i * delta, 1.0f, 0.0f),
+            glm::vec3(1.0f, 0.0f, 1.0f));
+        Debug::drawLine(
+            glm::vec3(0.0f, (float) i * delta, 0.0f),
+            glm::vec3(1.0f, (float) i * delta, 0.0f),
+            glm::vec3(1.0f, 0.0f, 1.0f));
+      }
+    }
+
+    EcsResult initEcs() {
+      CompOpReturn status;
+      entityId newId;
+      status = gameData.createEntity(&newId);
+      ECS_CHECK_ERR(status);
+      status = gameData.addPosition(newId, {0.f, 0.f, 1.f});
+      ECS_CHECK_ERR(status);
+      status = gameData.addLinearVel(newId, {0.f, 0.f, 0.f});
+      ECS_CHECK_ERR(status);
+      status = gameData.remPosition(newId);
+      ECS_CHECK_ERR(status);
+      return ECS_SUCCESS;
     }
 };
 
-class EcsDemo {
-
-};
-
 void main_loop(void *instance) {
-  HelloDemo *demo = (HelloDemo *) instance;
+  EcsDemo *demo = (EcsDemo *) instance;
   demo->mainLoop();
 }
 
 int main(int argc, char **argv) {
-  HelloDemo demo(argc, argv, glm::vec3(), glm::quat());
+  EcsDemo demo(argc, argv);
+  EcsResult status = demo.initEcs();
+  if (status.isError()) { fprintf(stderr, "%s", status.toString().c_str()); }
 
 #ifdef __EMSCRIPTEN__
   emscripten_set_main_loop_arg(main_loop, (void*)&demo, 0, 1);

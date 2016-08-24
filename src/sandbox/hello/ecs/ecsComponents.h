@@ -35,6 +35,7 @@ namespace ld2016 {
   struct Component {
     static compMask requiredComps;
     static compMask dependentComps;
+    static compMask thisCompMask;
   };
 
   /*
@@ -52,6 +53,11 @@ namespace ld2016 {
   #define SIG_Existence
   struct Existence : public Component<Existence> {
     compMask componentsPresent = NONE;
+    bool isPresent(ComponentTypes compType);
+    bool passesPrerequisitesForAddition(compMask mask);
+    bool passesDependenciesForRemoval(compMask mask);
+    void turnOnFlags(compMask mask);
+    void turnOffFlags(compMask mask);
   };
   #define SIG_Position glm::vec3
   struct Position : public Component<Position> {

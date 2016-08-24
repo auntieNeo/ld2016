@@ -76,7 +76,7 @@
     _i15, _i14, _i13, _i12, _i11, _i10, _i9, _i8, _i7, _i6, _i5, _i4, _i3, _i2, _i1, _i0) \
     (action, ##__VA_ARGS__)
 
-/*// Used in DO_FOR_EACH_PAIR below.
+// Used in DO_FOR_EACH_PAIR below.
 #define _a0(action, ...)
 #define _a2(action, arg0, arg1, ...) action(arg0, arg1) _a0(action, __VA_ARGS__)
 #define _a4(action, arg0, arg1, ...) action(arg0, arg1) _a2(action, __VA_ARGS__)
@@ -95,16 +95,16 @@
 #define _a30(action, arg0, arg1, ...) action(arg0, arg1) _a28(action, __VA_ARGS__)
 #define _a32(action, arg0, arg1, ...) action(arg0, arg1) _a30(action, __VA_ARGS__)
 
-*//**
+/**
  * Also iterates through variadic macro, but does so two at a time.
  * Accepts action, therefore, that acts upon two arguments.
  * If an odd number of variadic argments are provided, the last is neglected.
- *//*
+ */
 #define DO_FOR_EACH_PAIR(action, ...) \
     _GET_ARG_N(placeholder, ##__VA_ARGS__, \
     _a32, _a30, _a30, _a28, _a28, _a26, _a26, _a24, _a24, _a22, _a22, _a20, _a20, _a18, _a18, _a16, _a16, \
     _a14, _a14, _a12, _a12, _a10, _a10, _a8, _a8, _a6, _a6, _a4, _a4, _a2, _a2, _a0, _a0) \
-    (action, ##__VA_ARGS__)*/
+    (action, ##__VA_ARGS__)
 
 #define _GEN_COMP_ENUM(comp, i) ENUM_##comp = 1 << i,
 #define GEN_COMP_ENUMS(...) enum ComponentTypes { NONE = 0, ALL = -1, DO_FOR_EACH(_GEN_COMP_ENUM, __VA_ARGS__) };
@@ -138,7 +138,8 @@
   CompOpReturn EcsState::get##comp(const entityId id, comp** out) { getComp(comps_##comp, id, out); }
 #define COMP_COLL_DEFN(comp) _COMP_COLL_DEFN(comp, SIG_##comp)
 
-#define COMP_DEFN_REQD(comp, flags) template<> compMask Component<comp>::requiredComps = flags
+#define COMP_DEFN_REQD(comp, flags) template<> compMask Component<comp>::requiredComps = flags; \
+                                    template<> compMask Component<comp>::thisCompMask = ENUM_##comp
 #define COMP_DEFN_DEPN(comp, flags) template<> compMask Component<comp>::dependentComps = flags
 
 #endif //LD2016_TYPES_H

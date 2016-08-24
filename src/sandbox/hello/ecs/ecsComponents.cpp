@@ -20,7 +20,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#include "components.h"
+#include "ecsComponents.h"
 
 namespace ld2016 {
 
@@ -65,13 +65,25 @@ namespace ld2016 {
    * Sometimes its convenient to put helper methods in some components, however (like matrix calculators in a camera
    * component or something). It's up to coder discretion.
    */
+  bool Existence::isPresent(ComponentTypes compType) {
+    return compType & componentsPresent;
+  }
+  bool Existence::passesPrerequisitesForAddition(compMask mask) {
+    return (mask & componentsPresent) == mask;
+  }
+  bool Existence::passesDependenciesForRemoval(compMask mask) {
+    return (mask & componentsPresent) == 0;
+  }
+  void Existence::turnOnFlags(compMask mask) {
+    componentsPresent |= mask;
+  }
+  void Existence::turnOffFlags(compMask mask) {
+    componentsPresent &= ~mask;
+  }
   Position::Position(glm::vec3 vec) : vec(vec) {}
   LinearVel::LinearVel(glm::vec3 vec) : vec(vec) {}
   Orientation::Orientation(glm::quat quat) : quat(quat) {}
   AngularVel::AngularVel(glm::quat quat) : quat(quat) {}
   CameraView::CameraView(float fovy, float near, float far, float aspect)
       : fovy(fovy), near(near), far(far), aspect(aspect) {}
-
-  #undef COMP_DEFN_REQD
-  #undef COMP_DEFN_DEPN
 }

@@ -42,6 +42,8 @@ namespace ld2016 {
       KvMap();
       ~KvMap();
       V &at(const K &key);
+      V& operator [] (const K& key);
+      V& operator [] (K&& key);
       void clear() noexcept;
       bool contains(const K &key) const;
       template<class... Args>
@@ -52,21 +54,24 @@ namespace ld2016 {
       typedef typename std::unordered_map<K, V>::const_iterator const_iterator;
       const_iterator begin() const;// { return internalMap.begin(); }
       const_iterator end() const;// { return internalMap.end(); }
-
   };
 
   template<class K, class V>
-  KvMap<K, V>::KvMap() {
-
-  }
+  KvMap<K, V>::KvMap() { }
   template<class K, class V>
-  KvMap<K, V>::~KvMap() {
-
-  }
+  KvMap<K, V>::~KvMap() { }
   template<class K, class V>
   V &KvMap<K, V>::at(const K &key) {
     return internalMap.at(key);
   }
+  template<class K, class V>
+  V& KvMap<K, V>::operator [] (const K& key) {
+    return internalMap[key];
+  };
+  template<class K, class V>
+  V& KvMap<K, V>::operator [] (K&& key) {
+    return internalMap[key];
+  };
   template<class K, class V>
   void KvMap<K, V>::clear() noexcept {
     internalMap.clear();

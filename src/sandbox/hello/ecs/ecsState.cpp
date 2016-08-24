@@ -37,24 +37,44 @@ namespace ld2016 {
   COMP_COLL_DEFN(CameraView)
   COMP_COLL_DEFN(WasdControls)
 
+  CompOpReturn EcsState::createEntity(entityId *newId) {
+    // TODO: check against max entityId value
+    Existence* existence = &comps_Existence[++nextId];
+    existence->turnOnFlags(Existence::thisCompMask);
+    *newId = nextId;
+    return SUCCESS;
+  }
+
   template<typename compType, typename ... types>
   CompOpReturn EcsState::addComp(KvMap<entityId, compType>& coll, const entityId id, const types &... args) {
-    if ( ! (coll.emplace(std::piecewise_construct, std::forward_as_tuple(id), std::forward_as_tuple(args...)))) {
-      return REDUNDANT;
+    if (comps_Existence.count(id)) {
+      Existence* existence = &comps_Existence.at(id);
+      if (existence->passesPrerequisitesForAddition(compType::requiredComps)) {
+        if (coll.emplace(std::piecewise_construct, std::forward_as_tuple(id), std::forward_as_tuple(args...))) {
+          existence->turnOnFlags(compType::thisCompMask);
+          return SUCCESS;
+        }
+        return REDUNDANT;
+      }
+      return PREREQ_FAIL;
     }
-    return SUCCESS;
+    return NONEXISTENT_ENT;
   }
   template<typename compType>
   CompOpReturn EcsState::remComp(KvMap<entityId, compType>& coll, const entityId id, ComponentTypes flag) {
     if (coll.count(id)) {
       if (comps_Existence.count(id)) {
-        coll.erase(id);
-        comps_Existence.at(id).componentsPresent &= ~flag;
-        return SUCCESS;
+        Existence* existence = &comps_Existence.at(id);
+        if (existence->passesDependenciesForRemoval(compType::dependentComps)) {
+          coll.erase(id);
+          comps_Existence.at(id).componentsPresent &= ~flag;
+          return SUCCESS;
+        }
+        return DEPEND_FAIL;
       }
-      return INVALID_STATE;
+      return NONEXISTENT_ENT;
     }
-    return NONEXISTANT;
+    return NONEXISTENT_COMP;
   }
   template<typename compType>
   CompOpReturn EcsState::getComp(KvMap<entityId, compType> &coll, const entityId id, compType** out) {
@@ -62,7 +82,6 @@ namespace ld2016 {
       *out = &coll.at(id);
       return SUCCESS;
     }
-    return NONEXISTANT;
+    return NONEXISTENT_COMP;
   }
-
 }
