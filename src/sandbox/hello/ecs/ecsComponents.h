@@ -121,8 +121,8 @@ namespace ld2016 {
    */
   GEN_COMP_DECLS(ALL_COMPS)
 
-  compMask getRequiredComps(const int compType);
-  compMask getDependentComps(const int compType);
+  compMask getRequiredComps(int compType);
+  compMask getDependentComps(int compType);
 
 }
 

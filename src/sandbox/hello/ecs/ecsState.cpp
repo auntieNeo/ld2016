@@ -43,7 +43,17 @@ namespace ld2016 {
     return SUCCESS;
   }
 
-  CompOpReturn EcsState::deleteEntity(const entityId id) {
+  CompOpReturn EcsState::clearEntity(const entityId& id) {
+    Existence* existence;
+    CompOpReturn status = getExistence(id, &existence);
+    if (status != SUCCESS) {
+      return status;
+    }
+    GEN_CLEAR_ENT_LOOP_DEFN(ALL_COMPS)
+    return SUCCESS;
+  }
+
+  CompOpReturn EcsState::deleteEntity(const entityId& id) {
     CompOpReturn status = clearEntity(id);
     if (status != SUCCESS) {
       return status;
@@ -56,10 +66,20 @@ namespace ld2016 {
     return SUCCESS;
   }
 
-  /*
-   * This macro defines CompOpReturn clearEntity(const entityId id);
-   */
-  GEN_CLEAR_ENT_DEFN(ALL_COMPS);
+  void EcsState::listenForLikeEntities(const compMask &likeness,
+                                       CompOpCallback callback_add, CompOpCallback callback_rem) {
+    CompOpCallback checkForCompleteness = [&](const entityId& id){
+      if ((comps_Existence.at(id).componentsPresent & likeness) == likeness) {
+        callback_add(id);
+      }
+    };
+    CompOpCallback checkForInadequacy = [&](const entityId& id){
+      if ((comps_Existence.at(id).componentsPresent & likeness) != likeness) {
+        callback_rem(id);
+      }
+    };
+    GEN_LISTEN_FOR_LIKE_ENTITIES_INTERNALS(ALL_COMPS)
+  }
 
   template<typename compType, typename ... types>
   CompOpReturn EcsState::addComp(KvMap<entityId, compType>& coll, const entityId id,
@@ -69,7 +89,7 @@ namespace ld2016 {
       if (existence->passesPrerequisitesForAddition(compType::requiredComps)) {
         if (coll.emplace(std::piecewise_construct, std::forward_as_tuple(id), std::forward_as_tuple(args...))) {
           existence->turnOnFlags(compType::flag);
-          callbacks();
+          callbacks(id);
           return SUCCESS;
         }
         return REDUNDANT;
@@ -85,7 +105,7 @@ namespace ld2016 {
       if (comps_Existence.count(id)) {
         Existence* existence = &comps_Existence.at(id);
         if (existence->passesDependenciesForRemoval(compType::dependentComps)) {
-          callbacks();
+          callbacks(id);
           coll.erase(id);
           if ((void*)&coll != (void*)&comps_Existence) {
             comps_Existence.at(id).turnOffFlags(compType::flag);

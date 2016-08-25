@@ -33,7 +33,7 @@
 namespace ld2016 {
 
   typedef uint32_t entityId;
-  typedef std::function<void(void)> CompOpCallback;
+  typedef std::function<void(const entityId&)> CompOpCallback;
 
   /**
    * Component Operation Return Values
@@ -101,14 +101,20 @@ namespace ld2016 {
        * @param id
        * @return
        */
-      CompOpReturn clearEntity(const entityId id);
+      CompOpReturn clearEntity(const entityId& id);
 
       /**
        * Deletes an entity. It's ID may be re-used later, so this 'invalidates' the ID
        * @param id
        * @return
        */
-      CompOpReturn deleteEntity(const entityId id);
+      CompOpReturn deleteEntity(const entityId& id);
+
+      /**
+       *
+       * @param likeness
+       */
+      void listenForLikeEntities(const compMask& likeness, CompOpCallback callback_add, CompOpCallback callback_rem);
 
     private:
       entityId nextId = 0;

@@ -25,6 +25,7 @@
 
 #include <string>
 #include <vector>
+#include <algorithm>
 #include "ecsState.h"
 
 namespace ld2016 {
@@ -43,7 +44,7 @@ namespace ld2016 {
       std::vector<compMask> requiredComponents;
 
     public:
-      System(EcsState* game, std::string name, int numRegisters);
+      System(EcsState* game, std::string name, std::vector<compMask> entityTypesToWatch);
       bool init(std::stringstream& output);
       void tick();
       void pause();
@@ -54,12 +55,22 @@ namespace ld2016 {
   };
 
   template<typename Derived_System>
-  System<Derived_System>::System(EcsState* game, std::string name, int numRegisters)
+  System<Derived_System>::System(EcsState* game, std::string name, std::vector<compMask> entityTypesToWatch)
       : name(name), game(game)
   {
-    for (int i = 0; i < numRegisters; i++){
+    for (int i = 0; i < entityTypesToWatch.size(); i++){
       registeredIDs.push_back(std::vector<entityId>());
-      requiredComponents.push_back(NONE);
+      requiredComponents.push_back(entityTypesToWatch[i]);
+      game->listenForLikeEntities(entityTypesToWatch[i],
+        [&](const entityId& id) {
+          registeredIDs[i].push_back(id);
+        },
+        [&](const entityId& id) {
+          std::vector<entityId>::iterator position = std::find(registeredIDs[i].begin(), registeredIDs[i].end(), id);
+          if (position != registeredIDs[i].end()) {
+            registeredIDs[i].erase(position);
+          }
+        });
     }
   }
   template<typename Derived_System>
