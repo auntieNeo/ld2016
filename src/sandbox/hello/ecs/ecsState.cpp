@@ -39,16 +39,39 @@ namespace ld2016 {
   COMP_COLL_DEFN(WasdControls)
 
   CompOpReturn EcsState::createEntity(entityId *newId) {
-    // TODO: check against max entityId value
-    if (nextId == std::numeric_limits<entityId>::max() || ++nextId == std::numeric_limits<entityId>::max()) {
-      *newId = 0;
-      return MAX_ID_REACHED;
+    entityId id;
+    if (freedIds.empty()) {
+      if (nextId == std::numeric_limits<entityId>::max() || ++nextId == std::numeric_limits<entityId>::max()) {
+        *newId = 0;
+        return MAX_ID_REACHED;
+      }
+      id = nextId;
+    } else {
+      id = freedIds.top();
+      freedIds.pop();
     }
-    Existence* existence = &comps_Existence[nextId];
+    Existence *existence = &comps_Existence[id];
     existence->turnOnFlags(Existence::flag);
-    *newId = nextId;
+    *newId = id;
     return SUCCESS;
   }
+  CompOpReturn EcsState::deleteEntity(const entityId id) {
+    CompOpReturn status = clearEntity(id);
+    if (status != SUCCESS) {
+      return status;
+    }
+    status = remExistence(id);
+    if (status != SUCCESS) {
+      return status;
+    }
+    freedIds.push(id);
+    return SUCCESS;
+  }
+  /*
+   * This macro defines these function:
+   * CompOpReturn clearEntity(const entityId id);
+   */
+  GEN_CLEAR_ENT_DEFNS(ALL_COMPS);
 
   template<typename compType, typename ... types>
   CompOpReturn EcsState::addComp(KvMap<entityId, compType>& coll, const entityId id, const types &... args) {
@@ -72,7 +95,9 @@ namespace ld2016 {
         Existence* existence = &comps_Existence.at(id);
         if (existence->passesDependenciesForRemoval(compType::dependentComps)) {
           coll.erase(id);
-          comps_Existence.at(id).componentsPresent &= ~compType::flag;
+          if ((void*)&coll != (void*)&comps_Existence) {
+            comps_Existence.at(id).turnOffFlags(compType::flag);
+          }
           return SUCCESS;
         }
         return DEPEND_FAIL;

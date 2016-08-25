@@ -29,6 +29,9 @@
 #define _GET_ARG_N(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, \
                   _19, _20, _21, _22, _23, _24, _25, _26, _27, _28, _29, _30, _31, _32, _33, _N, ...) _N
 
+#define GET_NUM_ARGS(...) _GET_ARG_N(__VA_ARGS__, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20\
+                          19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)
+
 // The individual iterations of the for each (see DO_FOR_EACH below)
 #define _i0(action, ...)
 #define _i1(action, arg)      action(arg, 0)
@@ -107,7 +110,30 @@
     (action, ##__VA_ARGS__)
 
 #define _GEN_COMP_ENUM(comp, i) ENUM_##comp = 1 << i,
-#define GEN_COMP_ENUMS(...) enum ComponentTypes { NONE = 0, ALL = -1, DO_FOR_EACH(_GEN_COMP_ENUM, __VA_ARGS__) };
+#define _GEN_COMP_CASE_REQD(comp, i) case ENUM_##comp: return comp::requiredComps;
+#define _GEN_COMP_CASE_DEPN(comp, i) case ENUM_##comp: return comp::dependentComps;
+#define GEN_COMP_ENUMS(...) enum ComponentTypes { NONE = 0, ALL = -1, DO_FOR_EACH(_GEN_COMP_ENUM, __VA_ARGS__) }; \
+                            const uint8_t numCompTypes = GET_NUM_ARGS(__VA_ARGS__);
+
+#define GEN_COMP_HELPERS_DEFN(...) compMask getRequiredComps(const int compType) { switch(compType) { \
+                                   DO_FOR_EACH(_GEN_COMP_CASE_REQD, __VA_ARGS__) default: return ALL; } } \
+                                   compMask getDependentComps(const int compType) { switch(compType) { \
+                                   DO_FOR_EACH(_GEN_COMP_CASE_DEPN, __VA_ARGS__) default: return ALL; } } \
+
+#define _GEN_CLEAR_ENT(comp, i) if (ENUM_##comp != ENUM_Existence && existence->flagIsOn(ENUM_##comp)) { \
+                                  if (comps_##comp.count(id)) { \
+                                    comps_##comp.erase(id); \
+                                  } existence->turnOffFlags(ENUM_##comp); }
+#define GEN_CLEAR_ENT_DEFNS(...) \
+  CompOpReturn EcsState::clearEntity(const entityId id) { \
+    Existence* existence; \
+    CompOpReturn status = getExistence(id, &existence); \
+    if (status != SUCCESS) { \
+      return status; \
+    } \
+    DO_FOR_EACH(_GEN_CLEAR_ENT, __VA_ARGS__) \
+    return SUCCESS; \
+  }
 
 #define _GEN_ARG_NAME_NUMERIC(placeholder, i) , arg##i
 #define GEN_ARG_NAMES(...) DO_FOR_EACH(_GEN_ARG_NAME_NUMERIC, ##__VA_ARGS__)

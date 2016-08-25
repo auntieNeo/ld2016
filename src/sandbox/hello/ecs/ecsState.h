@@ -23,6 +23,7 @@
 #ifndef LD2016_ENTITIES_H
 #define LD2016_ENTITIES_H
 
+#include <stack>
 #include "ecsAutoGen.h"
 #include "ecsKvMap.h"
 #include "ecsComponents.h"
@@ -91,9 +92,6 @@ namespace ld2016 {
       COMP_COLL_DECL(CameraView)
       COMP_COLL_DECL(WasdControls)
 
-    private:
-      entityId nextId = 0;
-
     public:
       /**
        * Creates a new entity (specifically an Existence component]
@@ -101,8 +99,13 @@ namespace ld2016 {
        * @return SUCCESS or MAX_ID_REACHED if the maximum value of the entityId type has been reached
        */
       CompOpReturn createEntity(entityId *newId);
+      CompOpReturn clearEntity(const entityId id);
+      CompOpReturn deleteEntity(const entityId id);
 
     private:
+      entityId nextId = 0;
+      std::stack<entityId> freedIds;
+
       template<typename compType, typename ... types>
       CompOpReturn addComp(KvMap<entityId, compType>& coll, const entityId id, const types &... args);
       template<typename compType>

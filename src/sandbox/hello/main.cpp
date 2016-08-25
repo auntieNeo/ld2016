@@ -84,10 +84,17 @@ class EcsDemo : public Game {
       ECS_CHECK_ERR(status);
       status = gameData.addPosition(newId, {0.f, 0.f, 1.f});
       ECS_CHECK_ERR(status);
+      status = gameData.deleteEntity(newId);
+      ECS_CHECK_ERR(status);
+
+      entityId newNewId;
+      status = gameData.createEntity(&newNewId);
+      ECS_CHECK_ERR(status);
+      status = gameData.addPosition(newNewId, {0.f, 0.f, 1.f});
+      ECS_CHECK_ERR(status);
       status = gameData.addLinearVel(newId, {0.f, 0.f, 0.f});
       ECS_CHECK_ERR(status);
-      status = gameData.remPosition(newId);
-      ECS_CHECK_ERR(status);
+
       return ECS_SUCCESS;
     }
 };

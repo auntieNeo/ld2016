@@ -39,11 +39,10 @@ namespace ld2016 {
   };
 
   /*
-   * The following macro generates bit flag enumerations for all component types.
-   * TODO: Add an entry below for any new component types you create.
+   * TODO: Add an entry to the list below for any new component types you create.
    * Other files you will need to modify: ecsState.h, ecsState.cpp, components.cpp
    */
-  GEN_COMP_ENUMS(Existence, Position, LinearVel, Orientation, AngularVel, CameraView, WasdControls)
+  #define ALL_COMPS Existence, Position, LinearVel, Orientation, AngularVel, CameraView, WasdControls
 
   /*
    * The following are component type declarations.
@@ -52,8 +51,8 @@ namespace ld2016 {
    */
   #define SIG_Existence
   struct Existence : public Component<Existence> {
-    compMask componentsPresent = NONE;
-    bool isPresent(ComponentTypes compType);
+    compMask componentsPresent = 0;
+    bool flagIsOn(int compType);
     bool passesPrerequisitesForAddition(compMask mask);
     bool passesDependenciesForRemoval(compMask mask);
     void turnOnFlags(compMask mask);
@@ -88,6 +87,19 @@ namespace ld2016 {
   struct WasdControls : public Component<WasdControls> {
     glm::vec3 accel;
   };
+
+  /*
+   * This macro does the following:
+   * generates bit flag enumerations for all component types
+   * declares and defines uint8_t numCompTypes as the number of component types total
+   * declares these function:
+   * compMask getRequiredComps(int compType);
+   * compMask getDependentComps(int compType);
+   */
+  GEN_COMP_ENUMS(ALL_COMPS)
+
+  compMask getRequiredComps(const int compType);
+  compMask getDependentComps(const int compType);
 
 }
 

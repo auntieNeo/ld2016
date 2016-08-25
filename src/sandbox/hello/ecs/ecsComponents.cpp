@@ -32,7 +32,7 @@ namespace ld2016 {
    *
    * The second set of macros describe the inverse relationships, or for a given component, which other components
    * list it as a required component. This relationship is examined upon the deletion of a component. Notice that
-   * the existence component is a lists 'ALL' as its dependents.
+   * the existence component is a lists 'ALL' (minus itself) as its dependents.
    *
    * TODO: Add entries to both sections below for any new component types you create.
    * The generated format for any component enumerator is 'ENUM_[component_type].' As seen below, the ALL and NONE
@@ -49,7 +49,7 @@ namespace ld2016 {
   COMP_DEFN_REQD(CameraView, ENUM_Existence | ENUM_Position | ENUM_Orientation);
   COMP_DEFN_REQD(WasdControls, ENUM_Existence | ENUM_Position | ENUM_LinearVel | ENUM_Orientation | ENUM_AngularVel);
 
-  COMP_DEFN_DEPN(Existence, ALL);
+  COMP_DEFN_DEPN(Existence, ALL & ~ENUM_Existence);
   COMP_DEFN_DEPN(Position, ENUM_LinearVel | ENUM_CameraView | ENUM_WasdControls);
   COMP_DEFN_DEPN(LinearVel, ENUM_WasdControls);
   COMP_DEFN_DEPN(Orientation, ENUM_AngularVel | ENUM_CameraView | ENUM_WasdControls);
@@ -65,14 +65,14 @@ namespace ld2016 {
    * Sometimes its convenient to put helper methods in some components, however (like matrix calculators in a camera
    * component or something). It's up to coder discretion.
    */
-  bool Existence::isPresent(ComponentTypes compType) {
-    return compType & componentsPresent;
+  bool Existence::flagIsOn(int compType) {
+    return (compType & componentsPresent) != NONE;
   }
   bool Existence::passesPrerequisitesForAddition(compMask mask) {
     return (mask & componentsPresent) == mask;
   }
   bool Existence::passesDependenciesForRemoval(compMask mask) {
-    return (mask & componentsPresent) == 0;
+    return (mask & componentsPresent) == NONE;
   }
   void Existence::turnOnFlags(compMask mask) {
     componentsPresent |= mask;
@@ -86,4 +86,11 @@ namespace ld2016 {
   AngularVel::AngularVel(glm::quat quat) : quat(quat) {}
   CameraView::CameraView(float fovy, float near, float far, float aspect)
       : fovy(fovy), near(near), far(far), aspect(aspect) {}
+
+  /*
+   * This macro defines these function:
+   * compMask getRequiredComps(int compType);
+   * compMask getDependentComps(int compType);
+   */
+  GEN_COMP_HELPERS_DEFN(ALL_COMPS);
 }
