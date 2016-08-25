@@ -25,19 +25,6 @@
 
 namespace ld2016 {
 
-  /*
-   * The following macros DEFINE collections of each type of component and methods to access and modify them.
-   * TODO: Add an entry below for any new component types you create.
-   * Other files you will need to modify: ecsState.h, components.h, components.cpp
-   */
-  COMP_COLL_DEFN(Existence)
-  COMP_COLL_DEFN(Position)
-  COMP_COLL_DEFN(LinearVel)
-  COMP_COLL_DEFN(Orientation)
-  COMP_COLL_DEFN(AngularVel)
-  COMP_COLL_DEFN(CameraView)
-  COMP_COLL_DEFN(WasdControls)
-
   CompOpReturn EcsState::createEntity(entityId *newId) {
     entityId id;
     if (freedIds.empty()) {
@@ -55,6 +42,7 @@ namespace ld2016 {
     *newId = id;
     return SUCCESS;
   }
+
   CompOpReturn EcsState::deleteEntity(const entityId id) {
     CompOpReturn status = clearEntity(id);
     if (status != SUCCESS) {
@@ -67,19 +55,21 @@ namespace ld2016 {
     freedIds.push(id);
     return SUCCESS;
   }
+
   /*
-   * This macro defines these function:
-   * CompOpReturn clearEntity(const entityId id);
+   * This macro defines CompOpReturn clearEntity(const entityId id);
    */
-  GEN_CLEAR_ENT_DEFNS(ALL_COMPS);
+  GEN_CLEAR_ENT_DEFN(ALL_COMPS);
 
   template<typename compType, typename ... types>
-  CompOpReturn EcsState::addComp(KvMap<entityId, compType>& coll, const entityId id, const types &... args) {
+  CompOpReturn EcsState::addComp(KvMap<entityId, compType>& coll, const entityId id,
+                                 const CompOpCallback& callbacks, const types &... args) {
     if (comps_Existence.count(id)) {
       Existence* existence = &comps_Existence.at(id);
       if (existence->passesPrerequisitesForAddition(compType::requiredComps)) {
         if (coll.emplace(std::piecewise_construct, std::forward_as_tuple(id), std::forward_as_tuple(args...))) {
           existence->turnOnFlags(compType::flag);
+          callbacks();
           return SUCCESS;
         }
         return REDUNDANT;
@@ -88,12 +78,14 @@ namespace ld2016 {
     }
     return NONEXISTENT_ENT;
   }
+
   template<typename compType>
-  CompOpReturn EcsState::remComp(KvMap<entityId, compType>& coll, const entityId id) {
+  CompOpReturn EcsState::remComp(KvMap<entityId, compType>& coll, const entityId id, const CompOpCallback& callbacks) {
     if (coll.count(id)) {
       if (comps_Existence.count(id)) {
         Existence* existence = &comps_Existence.at(id);
         if (existence->passesDependenciesForRemoval(compType::dependentComps)) {
+          callbacks();
           coll.erase(id);
           if ((void*)&coll != (void*)&comps_Existence) {
             comps_Existence.at(id).turnOffFlags(compType::flag);
@@ -106,6 +98,7 @@ namespace ld2016 {
     }
     return NONEXISTENT_COMP;
   }
+
   template<typename compType>
   CompOpReturn EcsState::getComp(KvMap<entityId, compType> &coll, const entityId id, compType** out) {
     if (coll.count(id)) {
@@ -114,4 +107,10 @@ namespace ld2016 {
     }
     return NONEXISTENT_COMP;
   }
+
+  /*
+   * GEN_COLL_DEFNS wraps calls to the GEN_COMP_COLL_DEFN macro as defined in ecsComponents.h.
+   * The GEN_COMP_COLL_DEFN macros DEFINE collections of each type of component and methods to access and modify them.
+   */
+  GEN_COLL_DEFNS
 }

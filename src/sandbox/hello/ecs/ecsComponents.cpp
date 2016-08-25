@@ -34,28 +34,26 @@ namespace ld2016 {
    * list it as a required component. This relationship is examined upon the deletion of a component. Notice that
    * the existence component is a lists 'ALL' (minus itself) as its dependents.
    *
-   * TODO: Add entries to both sections below for any new component types you create.
+   * TODO: Add GEN_COMP_DEFN_REQD and GEN_COMP_DEFN_DEPN entries below for any new component types you create.
    * The generated format for any component enumerator is 'ENUM_[component_type].' As seen below, the ALL and NONE
    * enumerators also exist. Since these are bit flags, you can probably guess that NONE is zero and ALL is
    * unsigned -1, or in other words, ALL has all the bits turned on.
-   *
-   * Other files you will need to modify: ecsState.h, ecsState.cpp, components.h
    */
-  COMP_DEFN_REQD(Existence, NONE);
-  COMP_DEFN_REQD(Position, ENUM_Existence);
-  COMP_DEFN_REQD(LinearVel, ENUM_Existence | ENUM_Position);
-  COMP_DEFN_REQD(Orientation, ENUM_Existence);
-  COMP_DEFN_REQD(AngularVel, ENUM_Existence | ENUM_Orientation);
-  COMP_DEFN_REQD(CameraView, ENUM_Existence | ENUM_Position | ENUM_Orientation);
-  COMP_DEFN_REQD(WasdControls, ENUM_Existence | ENUM_Position | ENUM_LinearVel | ENUM_Orientation | ENUM_AngularVel);
+  GEN_COMP_DEFN_REQD(Existence, NONE);
+  GEN_COMP_DEFN_REQD(Position, ENUM_Existence);
+  GEN_COMP_DEFN_REQD(LinearVel, ENUM_Existence | ENUM_Position);
+  GEN_COMP_DEFN_REQD(Orientation, ENUM_Existence);
+  GEN_COMP_DEFN_REQD(AngularVel, ENUM_Existence | ENUM_Orientation);
+  GEN_COMP_DEFN_REQD(CameraView, ENUM_Existence | ENUM_Position | ENUM_Orientation);
+  GEN_COMP_DEFN_REQD(WasdControls, ENUM_Existence | ENUM_Position | ENUM_LinearVel | ENUM_Orientation | ENUM_AngularVel);
 
-  COMP_DEFN_DEPN(Existence, ALL & ~ENUM_Existence);
-  COMP_DEFN_DEPN(Position, ENUM_LinearVel | ENUM_CameraView | ENUM_WasdControls);
-  COMP_DEFN_DEPN(LinearVel, ENUM_WasdControls);
-  COMP_DEFN_DEPN(Orientation, ENUM_AngularVel | ENUM_CameraView | ENUM_WasdControls);
-  COMP_DEFN_DEPN(AngularVel, ENUM_WasdControls);
-  COMP_DEFN_DEPN(CameraView, NONE);
-  COMP_DEFN_DEPN(WasdControls, NONE);
+  GEN_COMP_DEFN_DEPN(Existence, ALL & ~ENUM_Existence);
+  GEN_COMP_DEFN_DEPN(Position, ENUM_LinearVel | ENUM_CameraView | ENUM_WasdControls);
+  GEN_COMP_DEFN_DEPN(LinearVel, ENUM_WasdControls);
+  GEN_COMP_DEFN_DEPN(Orientation, ENUM_AngularVel | ENUM_CameraView | ENUM_WasdControls);
+  GEN_COMP_DEFN_DEPN(AngularVel, ENUM_WasdControls);
+  GEN_COMP_DEFN_DEPN(CameraView, NONE);
+  GEN_COMP_DEFN_DEPN(WasdControls, NONE);
 
   /*
    * The following area is for the definitions of any component methods you create. Make sure that constructor
@@ -63,7 +61,7 @@ namespace ld2016 {
    * TODO: Add any and all component member method definitions here.
    * NOTE: Generally there shouldn't be methods except the constructor. Game logic ought to go in the systems instead.
    * Sometimes its convenient to put helper methods in some components, however (like matrix calculators in a camera
-   * component or something). It's up to coder discretion.
+   * component or something).
    */
   bool Existence::flagIsOn(int compType) {
     return (compType & componentsPresent) != NONE;
@@ -92,5 +90,5 @@ namespace ld2016 {
    * compMask getRequiredComps(int compType);
    * compMask getDependentComps(int compType);
    */
-  GEN_COMP_HELPERS_DEFN(ALL_COMPS);
+  GEN_COMP_DEFNS(ALL_COMPS);
 }

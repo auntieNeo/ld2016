@@ -24,6 +24,8 @@
 #define LD2016_ENTITIES_H
 
 #include <stack>
+#include <functional>
+#include <vector>
 #include "ecsAutoGen.h"
 #include "ecsKvMap.h"
 #include "ecsComponents.h"
@@ -31,6 +33,7 @@
 namespace ld2016 {
 
   typedef uint32_t entityId;
+  typedef std::function<void(void)> CompOpCallback;
 
   /**
    * Component Operation Return Values
@@ -54,6 +57,7 @@ namespace ld2016 {
    */
   class EcsState {
       /**
+       * GEN_COLL_DECLS is defined in ecsComponents.h and simply wraps calls to the COMP_COLL_DECL macro.
        * The COMP_COLL_DECL (Component Collection Declaration) macros DECLARE collections of each type of component,
        * as well as methods to access and modify said collections. The following methods are generated (examples given
        * for imaginary component 'FakeComponent'):
@@ -80,36 +84,44 @@ namespace ld2016 {
        * Example: CompOpReturn result = getFakeComponent(someId, FakeComponent** myPtr);
        * RETURNS: SUCCESS,
        *          NONEXISTENT_COMP if the component you're trying to access doesn't exist at that ID.
-       *
-       * TODO: Add an entry below (following example of other entries) for any new component types you create.
-       * Other files you will need to modify: ecsState.cpp, components.h, components.cpp
        */
-      COMP_COLL_DECL(Existence)
-      COMP_COLL_DECL(Position)
-      COMP_COLL_DECL(LinearVel)
-      COMP_COLL_DECL(Orientation)
-      COMP_COLL_DECL(AngularVel)
-      COMP_COLL_DECL(CameraView)
-      COMP_COLL_DECL(WasdControls)
+      GEN_COLL_DECLS
 
     public:
+
       /**
        * Creates a new entity (specifically an Existence component]
        * @param newId is set to the id of the newly created entity, or 0 if unsuccessful.
        * @return SUCCESS or MAX_ID_REACHED if the maximum value of the entityId type has been reached
        */
       CompOpReturn createEntity(entityId *newId);
+
+      /**
+       * Deletes all existing components from an entity except the Existence component
+       * @param id
+       * @return
+       */
       CompOpReturn clearEntity(const entityId id);
+
+      /**
+       * Deletes an entity. It's ID may be re-used later, so this 'invalidates' the ID
+       * @param id
+       * @return
+       */
       CompOpReturn deleteEntity(const entityId id);
 
     private:
       entityId nextId = 0;
       std::stack<entityId> freedIds;
 
+      /*
+       * These are used by macros to generate the functions listed above (in the comment for GEN_COLL_DECLS
+       */
       template<typename compType, typename ... types>
-      CompOpReturn addComp(KvMap<entityId, compType>& coll, const entityId id, const types &... args);
+      CompOpReturn addComp(KvMap<entityId, compType>& coll, const entityId id,
+                           const CompOpCallback& callbacks, const types &... args);
       template<typename compType>
-      CompOpReturn remComp(KvMap<entityId, compType>& coll, const entityId id);
+      CompOpReturn remComp(KvMap<entityId, compType>& coll, const entityId id, const CompOpCallback& callbacks);
       template<typename compType>
       CompOpReturn getComp(KvMap<entityId, compType>& coll, const entityId id, compType** out);
   };

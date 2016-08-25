@@ -39,12 +39,6 @@ namespace ld2016 {
   };
 
   /*
-   * TODO: Add an entry to the list below for any new component types you create.
-   * Other files you will need to modify: ecsState.h, ecsState.cpp, components.cpp
-   */
-  #define ALL_COMPS Existence, Position, LinearVel, Orientation, AngularVel, CameraView, WasdControls
-
-  /*
    * The following are component type declarations.
    * TODO: Declare new components here and be sure to define 'SIG_[component_type]' as the constructor parameter types.
    * NOTE: Just follow the examples of the others.
@@ -89,14 +83,43 @@ namespace ld2016 {
   };
 
   /*
+   * TODO: Add an entry to the end of each of the three directives below for any new component types you create.
+   * (follow examples of others)
+   */
+  #define ALL_COMPS \
+    Existence,      \
+    Position,       \
+    LinearVel,      \
+    Orientation,    \
+    AngularVel,     \
+    CameraView,     \
+    WasdControls
+
+  #define GEN_COLL_DECLS \
+    GEN_COMP_COLL_DECL(Existence)   \
+    GEN_COMP_COLL_DECL(Position)    \
+    GEN_COMP_COLL_DECL(LinearVel)   \
+    GEN_COMP_COLL_DECL(Orientation) \
+    GEN_COMP_COLL_DECL(AngularVel)  \
+    GEN_COMP_COLL_DECL(CameraView)  \
+    GEN_COMP_COLL_DECL(WasdControls)
+
+  #define GEN_COLL_DEFNS \
+    GEN_COMP_COLL_DEFN(Existence)   \
+    GEN_COMP_COLL_DEFN(Position)    \
+    GEN_COMP_COLL_DEFN(LinearVel)   \
+    GEN_COMP_COLL_DEFN(Orientation) \
+    GEN_COMP_COLL_DEFN(AngularVel)  \
+    GEN_COMP_COLL_DEFN(CameraView)  \
+    GEN_COMP_COLL_DEFN(WasdControls)
+
+  /*
    * This macro does the following:
    * generates bit flag enumerations for all component types
    * declares and defines uint8_t numCompTypes as the number of component types total
-   * declares these function:
-   * compMask getRequiredComps(int compType);
-   * compMask getDependentComps(int compType);
+   * declares these functions:
    */
-  GEN_COMP_ENUMS(ALL_COMPS)
+  GEN_COMP_DECLS(ALL_COMPS)
 
   compMask getRequiredComps(const int compType);
   compMask getDependentComps(const int compType);

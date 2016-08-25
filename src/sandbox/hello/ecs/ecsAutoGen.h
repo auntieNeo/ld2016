@@ -110,21 +110,22 @@
     (action, ##__VA_ARGS__)
 
 #define _GEN_COMP_ENUM(comp, i) ENUM_##comp = 1 << i,
-#define _GEN_COMP_CASE_REQD(comp, i) case ENUM_##comp: return comp::requiredComps;
-#define _GEN_COMP_CASE_DEPN(comp, i) case ENUM_##comp: return comp::dependentComps;
-#define GEN_COMP_ENUMS(...) enum ComponentTypes { NONE = 0, ALL = -1, DO_FOR_EACH(_GEN_COMP_ENUM, __VA_ARGS__) }; \
+#define GEN_COMP_DECLS(...) enum ComponentTypes { NONE = 0, ALL = -1, DO_FOR_EACH(_GEN_COMP_ENUM, __VA_ARGS__) }; \
                             const uint8_t numCompTypes = GET_NUM_ARGS(__VA_ARGS__);
 
-#define GEN_COMP_HELPERS_DEFN(...) compMask getRequiredComps(const int compType) { switch(compType) { \
-                                   DO_FOR_EACH(_GEN_COMP_CASE_REQD, __VA_ARGS__) default: return ALL; } } \
-                                   compMask getDependentComps(const int compType) { switch(compType) { \
-                                   DO_FOR_EACH(_GEN_COMP_CASE_DEPN, __VA_ARGS__) default: return ALL; } } \
+
+#define _GEN_COMP_CASE_REQD(comp, i) case ENUM_##comp: return comp::requiredComps;
+#define _GEN_COMP_CASE_DEPN(comp, i) case ENUM_##comp: return comp::dependentComps;
+#define GEN_COMP_DEFNS(...) compMask getRequiredComps(const int compType) { switch(compType) { \
+                            DO_FOR_EACH(_GEN_COMP_CASE_REQD, __VA_ARGS__) default: return ALL; } } \
+                            compMask getDependentComps(const int compType) { switch(compType) { \
+                            DO_FOR_EACH(_GEN_COMP_CASE_DEPN, __VA_ARGS__) default: return ALL; } }
 
 #define _GEN_CLEAR_ENT(comp, i) if (ENUM_##comp != ENUM_Existence && existence->flagIsOn(ENUM_##comp)) { \
                                   if (comps_##comp.count(id)) { \
                                     comps_##comp.erase(id); \
                                   } existence->turnOffFlags(ENUM_##comp); }
-#define GEN_CLEAR_ENT_DEFNS(...) \
+#define GEN_CLEAR_ENT_DEFN(...) \
   CompOpReturn EcsState::clearEntity(const entityId id) { \
     Existence* existence; \
     CompOpReturn status = getExistence(id, &existence); \
@@ -147,11 +148,20 @@
         CompOpReturn rem##comp(const entityId id);\
         CompOpReturn get##comp(const entityId id, comp** out);*/
 #define _COMP_COLL_DECL(comp, ...) \
-        private: KvMap<entityId, comp> comps_##comp; public: \
-        CompOpReturn add##comp(const entityId id GEN_ARG_NAMES_TYPED(__VA_ARGS__));\
-        CompOpReturn rem##comp(const entityId id);\
-        CompOpReturn get##comp(const entityId id, comp** out);
-#define COMP_COLL_DECL(comp) _COMP_COLL_DECL(comp, SIG_##comp)
+        private: \
+        KvMap<entityId, comp> comps_##comp; \
+        std::vector<CompOpCallback> addCallbacks_##comp; \
+        std::vector<CompOpCallback> remCallbacks_##comp; \
+        CompOpCallback fireAddCallbacks_##comp = [&]{ for (auto func : addCallbacks_##comp) { func(); } }; \
+        CompOpCallback fireRemCallbacks_##comp = [&]{ for (auto func : remCallbacks_##comp) { func(); } }; \
+        public: \
+        CompOpReturn add##comp(const entityId id GEN_ARG_NAMES_TYPED(__VA_ARGS__)); \
+        CompOpReturn rem##comp(const entityId id); \
+        CompOpReturn get##comp(const entityId id, comp** out); \
+        void registerAddCallback_##comp (CompOpCallback func); \
+        void registerRemCallback_##comp (CompOpCallback func);
+
+#define GEN_COMP_COLL_DECL(comp) _COMP_COLL_DECL(comp, SIG_##comp)
 
 /*#define _COMP_COLL_DEFN_NOARGS(comp) \
         CompOpReturn EcsState::add##comp(const entityId id) { addComp(comps_##comp, id); }\
@@ -159,13 +169,15 @@
         CompOpReturn EcsState::get##comp(const entityId id, comp** out) { getComp(comps_##comp, id, out); }*/
 #define _COMP_COLL_DEFN(comp, ...) \
   CompOpReturn EcsState::add##comp(const entityId id GEN_ARG_NAMES_TYPED(__VA_ARGS__)) \
-                              { addComp(comps_##comp, id GEN_ARG_NAMES(__VA_ARGS__)); }\
-  CompOpReturn EcsState::rem##comp(const entityId id) { remComp(comps_##comp, id); }\
-  CompOpReturn EcsState::get##comp(const entityId id, comp** out) { getComp(comps_##comp, id, out); }
-#define COMP_COLL_DEFN(comp) _COMP_COLL_DEFN(comp, SIG_##comp)
+                              { addComp(comps_##comp, id, fireAddCallbacks_##comp GEN_ARG_NAMES(__VA_ARGS__)); }\
+  CompOpReturn EcsState::rem##comp(const entityId id) { remComp(comps_##comp, id, fireRemCallbacks_##comp); }\
+  CompOpReturn EcsState::get##comp(const entityId id, comp** out) { getComp(comps_##comp, id, out); } \
+  void EcsState::registerAddCallback_##comp (CompOpCallback func) { addCallbacks_##comp.push_back(func); } \
+  void EcsState::registerRemCallback_##comp (CompOpCallback func) { remCallbacks_##comp.push_back(func); }
+#define GEN_COMP_COLL_DEFN(comp) _COMP_COLL_DEFN(comp, SIG_##comp)
 
-#define COMP_DEFN_REQD(comp, flags) template<> compMask Component<comp>::requiredComps = flags; \
+#define GEN_COMP_DEFN_REQD(comp, flags) template<> compMask Component<comp>::requiredComps = flags; \
                                     template<> compMask Component<comp>::flag = ENUM_##comp
-#define COMP_DEFN_DEPN(comp, flags) template<> compMask Component<comp>::dependentComps = flags
+#define GEN_COMP_DEFN_DEPN(comp, flags) template<> compMask Component<comp>::dependentComps = flags
 
 #endif //LD2016_TYPES_H
