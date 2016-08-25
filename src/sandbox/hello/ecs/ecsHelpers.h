@@ -20,8 +20,8 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#ifndef LD2016_ECSHELPERS_H
-#define LD2016_ECSHELPERS_H
+#ifndef ECS_HELPERS_H
+#define ECS_HELPERS_H
 
 #include <string>
 #include "ecsState.h"
@@ -37,7 +37,7 @@
 #define ECS_CHECK_ERR(res) if (res != SUCCESS) { return ECS_ERR(res); }
 #define ECS_CHECK_MSG(res, msg) if (res != SUCCESS) { return ECS_MSG(msg); }
 
-namespace ld2016 {
+namespace ecs {
   std::string resolveErrorToString(CompOpReturn err);
 
   struct EcsResult {
@@ -51,4 +51,4 @@ namespace ld2016 {
   };
 }
 
-#endif //LD2016_ECSHELPERS_H
+#endif //ECS_HELPERS_H

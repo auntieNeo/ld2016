@@ -20,8 +20,8 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#ifndef LD2016_ENTITIES_H
-#define LD2016_ENTITIES_H
+#ifndef ECS_STATE_H
+#define ECS_STATE_H
 
 #include <stack>
 #include <functional>
@@ -30,7 +30,7 @@
 #include "ecsKvMap.h"
 #include "ecsComponents.h"
 
-namespace ld2016 {
+namespace ecs {
 
   typedef uint32_t entityId;
   typedef std::function<void(const entityId&)> CompOpCallback;
@@ -55,7 +55,7 @@ namespace ld2016 {
    * of components stored in key-value mapped structures, where the keys are entity IDs and the values are the
    * components themselves. Entities per se only exist as associations between components that share the same ID.
    */
-  class EcsState {
+  class State {
       /**
        * GEN_COLL_DECLS is defined in ecsComponents.h and simply wraps calls to the COMP_COLL_DECL macro.
        * The COMP_COLL_DECL (Component Collection Declaration) macros DECLARE collections of each type of component,
@@ -134,4 +134,4 @@ namespace ld2016 {
 
 }
 
-#endif //LD2016_ENTITIES_H
+#endif //ECS_STATE_H

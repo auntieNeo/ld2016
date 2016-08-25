@@ -22,7 +22,7 @@
  */
 #include "ecsHelpers.h"
 
-namespace ld2016 {
+namespace ecs {
   #define GEN_CASE(e) case e: return #e
   std::string resolveErrorToString(CompOpReturn err) {
     switch (err) {

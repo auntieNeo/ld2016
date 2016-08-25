@@ -20,14 +20,14 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#ifndef LD2016_ECS_H
-#define LD2016_ECS_H
+#ifndef ECS_COMPONENTS_H
+#define ECS_COMPONENTS_H
 
 #include "ecsAutoGen.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-namespace ld2016 {
+namespace ecs {
 
   typedef uint32_t compMask;
 
@@ -126,4 +126,4 @@ namespace ld2016 {
 
 }
 
-#endif //LD2016_ECS_H
+#endif //ECS_COMPONENTS_H

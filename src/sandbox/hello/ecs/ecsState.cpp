@@ -23,9 +23,9 @@
 #include <limits>
 #include "ecsState.h"
 
-namespace ld2016 {
+namespace ecs {
 
-  CompOpReturn EcsState::createEntity(entityId *newId) {
+  CompOpReturn State::createEntity(entityId *newId) {
     entityId id;
     if (freedIds.empty()) {
       if (nextId == std::numeric_limits<entityId>::max() || ++nextId == std::numeric_limits<entityId>::max()) {
@@ -43,7 +43,7 @@ namespace ld2016 {
     return SUCCESS;
   }
 
-  CompOpReturn EcsState::clearEntity(const entityId& id) {
+  CompOpReturn State::clearEntity(const entityId& id) {
     Existence* existence;
     CompOpReturn status = getExistence(id, &existence);
     if (status != SUCCESS) {
@@ -53,7 +53,7 @@ namespace ld2016 {
     return SUCCESS;
   }
 
-  CompOpReturn EcsState::deleteEntity(const entityId& id) {
+  CompOpReturn State::deleteEntity(const entityId& id) {
     CompOpReturn status = clearEntity(id);
     if (status != SUCCESS) {
       return status;
@@ -66,7 +66,7 @@ namespace ld2016 {
     return SUCCESS;
   }
 
-  void EcsState::listenForLikeEntities(const compMask &likeness,
+  void State::listenForLikeEntities(const compMask &likeness,
                                        CompOpCallback callback_add, CompOpCallback callback_rem) {
     CompOpCallback checkForCompleteness = [&](const entityId& id){
       if ((comps_Existence.at(id).componentsPresent & likeness) == likeness) {
@@ -82,7 +82,7 @@ namespace ld2016 {
   }
 
   template<typename compType, typename ... types>
-  CompOpReturn EcsState::addComp(KvMap<entityId, compType>& coll, const entityId id,
+  CompOpReturn State::addComp(KvMap<entityId, compType>& coll, const entityId id,
                                  const CompOpCallback& callbacks, const types &... args) {
     if (comps_Existence.count(id)) {
       Existence* existence = &comps_Existence.at(id);
@@ -100,7 +100,7 @@ namespace ld2016 {
   }
 
   template<typename compType>
-  CompOpReturn EcsState::remComp(KvMap<entityId, compType>& coll, const entityId id, const CompOpCallback& callbacks) {
+  CompOpReturn State::remComp(KvMap<entityId, compType>& coll, const entityId id, const CompOpCallback& callbacks) {
     if (coll.count(id)) {
       if (comps_Existence.count(id)) {
         Existence* existence = &comps_Existence.at(id);
@@ -120,7 +120,7 @@ namespace ld2016 {
   }
 
   template<typename compType>
-  CompOpReturn EcsState::getComp(KvMap<entityId, compType> &coll, const entityId id, compType** out) {
+  CompOpReturn State::getComp(KvMap<entityId, compType> &coll, const entityId id, compType** out) {
     if (coll.count(id)) {
       *out = &coll.at(id);
       return SUCCESS;

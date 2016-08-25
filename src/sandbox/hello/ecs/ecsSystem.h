@@ -20,74 +20,68 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#ifndef LD2016_ECSSYSTEMS_H
-#define LD2016_ECSSYSTEMS_H
+#ifndef ECS_SYSTEM_H
+#define ECS_SYSTEM_H
 
 #include <string>
 #include <vector>
 #include <algorithm>
 #include "ecsState.h"
 
-namespace ld2016 {
+namespace ecs {
 
   template<typename Derived_System>
   class System
   {
     private:
-      std::string name;
       bool paused = false;
       Derived_System& sys();
 
     protected:
-      EcsState* game;
+      State* game;
       std::vector<std::vector<entityId>> registeredIDs;
       std::vector<compMask> requiredComponents;
 
     public:
-      System(EcsState* game, std::string name, std::vector<compMask> entityTypesToWatch);
-      bool init(std::stringstream& output);
+      System(State* game);
+      bool init(std::stringstream& output, std::vector<compMask> entityTypesToWatch);
       void tick();
       void pause();
       void resume();
       void clean();
       bool isPaused();
-      std::string getName();
   };
 
   template<typename Derived_System>
-  System<Derived_System>::System(EcsState* game, std::string name, std::vector<compMask> entityTypesToWatch)
-      : name(name), game(game)
-  {
-    for (int i = 0; i < entityTypesToWatch.size(); i++){
-      registeredIDs.push_back(std::vector<entityId>());
-      requiredComponents.push_back(entityTypesToWatch[i]);
-      game->listenForLikeEntities(entityTypesToWatch[i],
-        [&](const entityId& id) {
-          registeredIDs[i].push_back(id);
-        },
-        [&](const entityId& id) {
-          std::vector<entityId>::iterator position = std::find(registeredIDs[i].begin(), registeredIDs[i].end(), id);
-          if (position != registeredIDs[i].end()) {
-            registeredIDs[i].erase(position);
-          }
-        });
-    }
-  }
+  System<Derived_System>::System(State* game)
+      : game(game) { }
   template<typename Derived_System>
   Derived_System& System<Derived_System>::sys() {
     return *static_cast<Derived_System*>(this);
   }
   template<typename Derived_System>
-  bool System<Derived_System>::init(std::stringstream& output) {
+  bool System<Derived_System>::init(std::stringstream& output, std::vector<compMask> entityTypesToWatch) {
+    for (int i = 0; i < entityTypesToWatch.size(); i++) {
+      registeredIDs.push_back(std::vector<entityId>());
+      requiredComponents.push_back(entityTypesToWatch[i]);
+      game->listenForLikeEntities(entityTypesToWatch[i],
+        [&](const entityId &id) {
+          registeredIDs[i].push_back(id);
+        },
+        [&](const entityId &id) {
+          std::vector<entityId>::iterator position = std::find(registeredIDs[i].begin(),
+                                                               registeredIDs[i].end(), id);
+          if (position != registeredIDs[i].end()) {
+            registeredIDs[i].erase(position);
+          }
+        }
+      );
+    }
     return sys().onInit(output);
   }
   template<typename Derived_System>
   void System<Derived_System>::tick() {
     sys().onTick();
-  }
-  template<typename Derived_System>
-  std::string System<Derived_System>::getName(){
-    return name;
   }
   template<typename Derived_System>
   void System<Derived_System>::pause(){
@@ -114,4 +108,4 @@ namespace ld2016 {
   }
 }
 
-#endif //LD2016_ECSSYSTEMS_H
+#endif //ECS_SYSTEM_H

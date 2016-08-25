@@ -22,7 +22,7 @@
  */
 #include "ecsComponents.h"
 
-namespace ld2016 {
+namespace ecs {
 
   /*
    * The following macros describe the dependency relationships between components.The first block enumerates for

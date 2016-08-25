@@ -36,12 +36,13 @@
 #include "ecs/ecsHelpers.h"
 
 using namespace ld2016;
+using namespace ecs;
 
 class EcsDemo : public Game {
   private:
     std::shared_ptr<WasdCamera> m_camera;
     std::shared_ptr<MeshObject> m_mesh;
-    EcsState gameData;
+    State gameData;
   public:
     EcsDemo(int argc, char **argv)
         : Game(argc, argv, "Entity Component Sytem Demo") {
