@@ -59,7 +59,7 @@ namespace ld2016 {
         return false;
       }
 
-      void mainLoop();
+      float mainLoop();
   };
 }
 

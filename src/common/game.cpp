@@ -116,7 +116,9 @@ namespace ld2016 {
     m_scene->addObject(Debug::instance());
   }
 
-  void Game::mainLoop() {
+  float Game::mainLoop() {
+    SDL_GL_SwapWindow(m_window);
+
     if (m_lastTime == 0.0f) {
       // FIXME: The zero dt this causes might not be desirable.
       m_lastTime = (float)SDL_GetTicks() * 1000.0f;
@@ -162,6 +164,6 @@ namespace ld2016 {
       m_scene->draw(*m_camera, aspect);
     }
 
-    SDL_GL_SwapWindow(m_window);
+    return dt;
   }
 }
