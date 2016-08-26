@@ -80,7 +80,6 @@ class EcsDemo : public Game {
             glm::vec3(1.0f, 0.0f, 1.0f));
       }
     }
-
     EcsResult initEcs() {
       movementSystem.init();
 
@@ -90,18 +89,20 @@ class EcsDemo : public Game {
       ECS_CHECK_ERR(status);
       status = state.addPosition(newId, {0.f, 0.f, 1.f});
       ECS_CHECK_ERR(status);
-      status = state.addLinearVel(newId, {0.f, 0.f, 0.f});
-      ECS_CHECK_ERR(status);
-      status = state.remLinearVel(newId);
+      status = state.addLinearVel(newId, {0.f, 0.f, -0.000001f});
       ECS_CHECK_ERR(status);
 
       return ECS_SUCCESS;
+    }
+    void tickEcs(float dt) {
+      movementSystem.tick(dt);
     }
 };
 
 void main_loop(void *instance) {
   EcsDemo *demo = (EcsDemo *) instance;
-  demo->mainLoop();
+  float dt = demo->mainLoop();
+  demo->tickEcs(dt);
 }
 
 int main(int argc, char **argv) {

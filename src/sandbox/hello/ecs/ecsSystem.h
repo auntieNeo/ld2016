@@ -38,11 +38,11 @@ namespace ecs {
       Derived_System& sys();
 
     protected:
-      State* game;
+      State* state;
       std::vector<std::vector<entityId>> registeredIDs;
 
     public:
-      System(State* game);
+      System(State* state);
       bool init();
       void tick(float dt);
       void pause();
@@ -52,8 +52,8 @@ namespace ecs {
   };
 
   template<typename Derived_System>
-  System<Derived_System>::System(State* game)
-      : game(game) { }
+  System<Derived_System>::System(State* state)
+      : state(state) { }
   template<typename Derived_System>
   Derived_System& System<Derived_System>::sys() {
     return *static_cast<Derived_System*>(this);
@@ -75,7 +75,7 @@ namespace ecs {
     registeredIDs.resize(sys().requiredComponents.size());
     for (int i = 0; i < sys().requiredComponents.size(); i++) {
       registeredIDs.push_back(std::vector<entityId>());
-      game->listenForLikeEntities(sys().requiredComponents[i],
+      state->listenForLikeEntities(sys().requiredComponents[i],
         EntNotifyDelegate{ DELEGATE_NOCLASS(discover), sys().requiredComponents[i], &registeredIDs[i] },
         EntNotifyDelegate{ DELEGATE_NOCLASS(forget), sys().requiredComponents[i], &registeredIDs[i] }
       );
@@ -84,7 +84,7 @@ namespace ecs {
   }
   template<typename Derived_System>
   void System<Derived_System>::tick(float dt) {
-    sys().onTick();
+    sys().onTick(dt);
   }
   template<typename Derived_System>
   void System<Derived_System>::pause(){

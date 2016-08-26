@@ -31,6 +31,19 @@ namespace ecs {
     return true;
   }
   void MovementSystem::onTick(float dt) {
-
+    for (auto id : registeredIDs[0]) {
+      Position* posComp;
+      state->getPosition(id, &posComp);
+      LinearVel* velComp;
+      state->getLinearVel(id, &velComp);
+      posComp->vec += dt * velComp->vec;
+    }
+    for (auto id : registeredIDs[1]) {
+      Orientation* oriComp;
+      state->getOrientation(id, &oriComp);
+      AngularVel* velComp;
+      state->getAngularVel(id, &velComp);
+      // TODO: apply angular velocity quat to orientation quat * dt
+    }
   }
 }
