@@ -40,12 +40,11 @@ namespace ecs {
     protected:
       State* game;
       std::vector<std::vector<entityId>> registeredIDs;
-      std::vector<compMask> requiredComponents;
 
     public:
       System(State* game);
-      bool init(std::stringstream& output, std::vector<compMask> entityTypesToWatch);
-      void tick();
+      bool init();
+      void tick(float dt);
       void pause();
       void resume();
       void clean();
@@ -59,28 +58,32 @@ namespace ecs {
   Derived_System& System<Derived_System>::sys() {
     return *static_cast<Derived_System*>(this);
   }
-  template<typename Derived_System>
-  bool System<Derived_System>::init(std::stringstream& output, std::vector<compMask> entityTypesToWatch) {
-    for (int i = 0; i < entityTypesToWatch.size(); i++) {
-      registeredIDs.push_back(std::vector<entityId>());
-      requiredComponents.push_back(entityTypesToWatch[i]);
-      game->listenForLikeEntities(entityTypesToWatch[i],
-        [&](const entityId &id) {
-          registeredIDs[i].push_back(id);
-        },
-        [&](const entityId &id) {
-          std::vector<entityId>::iterator position = std::find(registeredIDs[i].begin(),
-                                                               registeredIDs[i].end(), id);
-          if (position != registeredIDs[i].end()) {
-            registeredIDs[i].erase(position);
-          }
-        }
-      );
+  static void discover(const entityId& id, void* data) {
+    std::vector<entityId>* registry = (std::vector<entityId>*)data;
+    registry->push_back(id);
+  }
+  static void forget(const entityId& id, void* data) {
+    std::vector<entityId>* registry = (std::vector<entityId>*)data;
+    std::vector<entityId>::iterator position = std::find(registry->begin(),
+                                                         registry->end(), id);
+    if (position != registry->end()) {
+      registry->erase(position);
     }
-    return sys().onInit(output);
   }
   template<typename Derived_System>
-  void System<Derived_System>::tick() {
+  bool System<Derived_System>::init() {
+    registeredIDs.resize(sys().requiredComponents.size());
+    for (int i = 0; i < sys().requiredComponents.size(); i++) {
+      registeredIDs.push_back(std::vector<entityId>());
+      game->listenForLikeEntities(sys().requiredComponents[i],
+        EntNotifyDelegate{ DELEGATE_NOCLASS(discover), sys().requiredComponents[i], &registeredIDs[i] },
+        EntNotifyDelegate{ DELEGATE_NOCLASS(forget), sys().requiredComponents[i], &registeredIDs[i] }
+      );
+    }
+    sys().onInit();
+  }
+  template<typename Derived_System>
+  void System<Derived_System>::tick(float dt) {
     sys().onTick();
   }
   template<typename Derived_System>

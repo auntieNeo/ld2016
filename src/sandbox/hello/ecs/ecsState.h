@@ -27,13 +27,19 @@
 #include <functional>
 #include <vector>
 #include "ecsAutoGen.h"
-#include "ecsKvMap.h"
 #include "ecsComponents.h"
+#include "ecsDelegate.h"
+#include "ecsKvMap.h"
 
 namespace ecs {
 
   typedef uint32_t entityId;
-  typedef std::function<void(const entityId&)> CompOpCallback;
+  struct EntNotifyDelegate {
+    Delegate<void(const entityId&, void* data)> dlgt;
+    compMask likeness;
+    void* data;
+  };
+  typedef std::vector<EntNotifyDelegate> EntNotifyDelegates;
 
   /**
    * Component Operation Return Values
@@ -98,23 +104,27 @@ namespace ecs {
 
       /**
        * Deletes all existing components from an entity except the Existence component
-       * @param id
-       * @return
+       * @param id The entity ID of the entity you wish to clear
+       * @return SUCCESS or NONEXISENT_ENT if no entity exists at that id
        */
       CompOpReturn clearEntity(const entityId& id);
 
       /**
        * Deletes an entity. It's ID may be re-used later, so this 'invalidates' the ID
-       * @param id
-       * @return
+       * @param id The entity ID of the entity you wish to delete
+       * @return any of the possible return values of remExistence given that ID (see above)
        */
       CompOpReturn deleteEntity(const entityId& id);
 
       /**
-       *
-       * @param likeness
+       * Use if you want to fire a callback whenever an entity with at least the components described by 'likeness'
+       * comes into or leaved existence.
+       * @param likeness The component mask describing all components necessary for an entity to trigger these callbacks
+       * @param callback_add Pointer to the callback to fire when a qualifying entity appears
+       * @param callback_rem Pointer to the callback to fire when such an entity ceases to qualify
        */
-      void listenForLikeEntities(const compMask& likeness, CompOpCallback callback_add, CompOpCallback callback_rem);
+      void listenForLikeEntities(const compMask& likeness,
+                                 EntNotifyDelegate&& additionDelegate, EntNotifyDelegate&& removalDelegate);
 
     private:
       entityId nextId = 0;
@@ -124,12 +134,12 @@ namespace ecs {
        * These are used by macros to generate the functions listed above (in the comment for GEN_COLL_DECLS
        */
       template<typename compType, typename ... types>
-      CompOpReturn addComp(KvMap<entityId, compType>& coll, const entityId id,
-                           const CompOpCallback& callbacks, const types &... args);
+      CompOpReturn addComp(KvMap<entityId, compType>& coll, const entityId& id,
+                           const EntNotifyDelegates& callbacks, const types &... args);
       template<typename compType>
-      CompOpReturn remComp(KvMap<entityId, compType>& coll, const entityId id, const CompOpCallback& callbacks);
+      CompOpReturn remComp(KvMap<entityId, compType>& coll, const entityId& id, const EntNotifyDelegates& callbacks);
       template<typename compType>
-      CompOpReturn getComp(KvMap<entityId, compType>& coll, const entityId id, compType** out);
+      CompOpReturn getComp(KvMap<entityId, compType>& coll, const entityId& id, compType** out);
   };
 
 }

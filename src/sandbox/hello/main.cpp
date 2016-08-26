@@ -32,8 +32,10 @@
 #include "../../common/wasdCamera.h"
 #include "../../common/game.h"
 #include "../../common/meshObject.h"
+
 #include "ecs/ecsState.h"
 #include "ecs/ecsHelpers.h"
+#include "ecs/ecsSystem_movement.h"
 
 using namespace ld2016;
 using namespace ecs;
@@ -42,10 +44,11 @@ class EcsDemo : public Game {
   private:
     std::shared_ptr<WasdCamera> m_camera;
     std::shared_ptr<MeshObject> m_mesh;
-    State gameData;
+    State state;
+    MovementSystem movementSystem;
   public:
     EcsDemo(int argc, char **argv)
-        : Game(argc, argv, "Entity Component Sytem Demo") {
+        : Game(argc, argv, "Entity Component Sytem Demo"), movementSystem(&state) {
       // Populate the graphics scene
       m_camera = std::shared_ptr<WasdCamera>(
           new WasdCamera(
@@ -79,21 +82,17 @@ class EcsDemo : public Game {
     }
 
     EcsResult initEcs() {
+      movementSystem.init();
+
       CompOpReturn status;
       entityId newId;
-      status = gameData.createEntity(&newId);
+      status = state.createEntity(&newId);
       ECS_CHECK_ERR(status);
-      status = gameData.addPosition(newId, {0.f, 0.f, 1.f});
+      status = state.addPosition(newId, {0.f, 0.f, 1.f});
       ECS_CHECK_ERR(status);
-      status = gameData.deleteEntity(newId);
+      status = state.addLinearVel(newId, {0.f, 0.f, 0.f});
       ECS_CHECK_ERR(status);
-
-      entityId newNewId;
-      status = gameData.createEntity(&newNewId);
-      ECS_CHECK_ERR(status);
-      status = gameData.addPosition(newNewId, {0.f, 0.f, 1.f});
-      ECS_CHECK_ERR(status);
-      status = gameData.addLinearVel(newId, {0.f, 0.f, 0.f});
+      status = state.remLinearVel(newId);
       ECS_CHECK_ERR(status);
 
       return ECS_SUCCESS;

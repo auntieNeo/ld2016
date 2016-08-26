@@ -24,7 +24,6 @@
 #include "ecsState.h"
 
 namespace ecs {
-
   CompOpReturn State::createEntity(entityId *newId) {
     entityId id;
     if (freedIds.empty()) {
@@ -66,30 +65,24 @@ namespace ecs {
     return SUCCESS;
   }
 
-  void State::listenForLikeEntities(const compMask &likeness,
-                                       CompOpCallback callback_add, CompOpCallback callback_rem) {
-    CompOpCallback checkForCompleteness = [&](const entityId& id){
-      if ((comps_Existence.at(id).componentsPresent & likeness) == likeness) {
-        callback_add(id);
-      }
-    };
-    CompOpCallback checkForInadequacy = [&](const entityId& id){
-      if ((comps_Existence.at(id).componentsPresent & likeness) != likeness) {
-        callback_rem(id);
-      }
-    };
+  void State::listenForLikeEntities(const compMask& likeness,
+                                    EntNotifyDelegate&& additionDelegate, EntNotifyDelegate&& removalDelegate) {
     GEN_LISTEN_FOR_LIKE_ENTITIES_INTERNALS(ALL_COMPS)
   }
 
   template<typename compType, typename ... types>
-  CompOpReturn State::addComp(KvMap<entityId, compType>& coll, const entityId id,
-                                 const CompOpCallback& callbacks, const types &... args) {
+  CompOpReturn State::addComp(KvMap<entityId, compType>& coll, const entityId& id,
+                                 const EntNotifyDelegates& callbacks, const types &... args) {
     if (comps_Existence.count(id)) {
       Existence* existence = &comps_Existence.at(id);
       if (existence->passesPrerequisitesForAddition(compType::requiredComps)) {
         if (coll.emplace(std::piecewise_construct, std::forward_as_tuple(id), std::forward_as_tuple(args...))) {
           existence->turnOnFlags(compType::flag);
-          callbacks(id);
+          for (auto dlgt : callbacks) {
+            if ((comps_Existence.at(id).componentsPresent & dlgt.likeness) == dlgt.likeness) {
+              dlgt.dlgt(id, dlgt.data);
+            }
+          }
           return SUCCESS;
         }
         return REDUNDANT;
@@ -100,15 +93,19 @@ namespace ecs {
   }
 
   template<typename compType>
-  CompOpReturn State::remComp(KvMap<entityId, compType>& coll, const entityId id, const CompOpCallback& callbacks) {
+  CompOpReturn State::remComp(KvMap<entityId, compType>& coll, const entityId& id, const EntNotifyDelegates& callbacks) {
     if (coll.count(id)) {
       if (comps_Existence.count(id)) {
         Existence* existence = &comps_Existence.at(id);
         if (existence->passesDependenciesForRemoval(compType::dependentComps)) {
-          callbacks(id);
-          coll.erase(id);
           if ((void*)&coll != (void*)&comps_Existence) {
             comps_Existence.at(id).turnOffFlags(compType::flag);
+          }
+          coll.erase(id);
+          for (auto dlgt : callbacks) {
+            if ((comps_Existence.at(id).componentsPresent & dlgt.likeness) != dlgt.likeness) {
+              dlgt.dlgt(id, dlgt.data);
+            }
           }
           return SUCCESS;
         }
@@ -120,7 +117,7 @@ namespace ecs {
   }
 
   template<typename compType>
-  CompOpReturn State::getComp(KvMap<entityId, compType> &coll, const entityId id, compType** out) {
+  CompOpReturn State::getComp(KvMap<entityId, compType> &coll, const entityId& id, compType** out) {
     if (coll.count(id)) {
       *out = &coll.at(id);
       return SUCCESS;

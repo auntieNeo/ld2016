@@ -128,8 +128,10 @@
 #define GEN_CLEAR_ENT_LOOP_DEFN(...) DO_FOR_EACH(_GEN_CLEAR_ENT, __VA_ARGS__)
 
 #define _GEN_LISTEN_FOR_LIKE_ENTITIES_INTERNALS(comp, i) \
-          if(likeness & ENUM_##comp) { registerAddCallback_##comp(checkForCompleteness);\
-                                       registerRemCallback_##comp(checkForInadequacy); }
+  if(likeness & ENUM_##comp) { \
+    registerAddCallback_##comp(additionDelegate);\
+    registerRemCallback_##comp(removalDelegate); \
+  }
 #define GEN_LISTEN_FOR_LIKE_ENTITIES_INTERNALS(...) DO_FOR_EACH(_GEN_LISTEN_FOR_LIKE_ENTITIES_INTERNALS, __VA_ARGS__)
 
 #define _GEN_ARG_NAME_NUMERIC(placeholder, i) , arg##i
@@ -146,18 +148,14 @@
 #define _COMP_COLL_DECL(comp, ...) \
         private: \
         KvMap<entityId, comp> comps_##comp; \
-        std::vector<CompOpCallback> addCallbacks_##comp; \
-        std::vector<CompOpCallback> remCallbacks_##comp; \
-        CompOpCallback fireAddCallbacks_##comp = \
-        [&](const entityId& id){ for (auto func : addCallbacks_##comp) { func(id); } }; \
-        CompOpCallback fireRemCallbacks_##comp = \
-        [&](const entityId& id){ for (auto func : remCallbacks_##comp) { func(id); } }; \
+        std::vector<EntNotifyDelegate> addCallbacks_##comp; \
+        std::vector<EntNotifyDelegate> remCallbacks_##comp; \
         public: \
         CompOpReturn add##comp(const entityId& id GEN_ARG_NAMES_TYPED(__VA_ARGS__)); \
         CompOpReturn rem##comp(const entityId& id); \
         CompOpReturn get##comp(const entityId& id, comp** out); \
-        void registerAddCallback_##comp (CompOpCallback func); \
-        void registerRemCallback_##comp (CompOpCallback func);
+        void registerAddCallback_##comp (EntNotifyDelegate& dlgt); \
+        void registerRemCallback_##comp (EntNotifyDelegate& dlgt);
 
 #define GEN_COMP_COLL_DECL(comp) _COMP_COLL_DECL(comp, SIG_##comp)
 
@@ -167,11 +165,11 @@
         CompOpReturn State::get##comp(const entityId id, comp** out) { getComp(comps_##comp, id, out); }*/
 #define _COMP_COLL_DEFN(comp, ...) \
   CompOpReturn State::add##comp(const entityId& id GEN_ARG_NAMES_TYPED(__VA_ARGS__)) \
-                              { addComp(comps_##comp, id, fireAddCallbacks_##comp GEN_ARG_NAMES(__VA_ARGS__)); }\
-  CompOpReturn State::rem##comp(const entityId& id) { remComp(comps_##comp, id, fireRemCallbacks_##comp); }\
+                              { addComp(comps_##comp, id, addCallbacks_##comp GEN_ARG_NAMES(__VA_ARGS__)); }\
+  CompOpReturn State::rem##comp(const entityId& id) { remComp(comps_##comp, id, remCallbacks_##comp); }\
   CompOpReturn State::get##comp(const entityId& id, comp** out) { getComp(comps_##comp, id, out); } \
-  void State::registerAddCallback_##comp (CompOpCallback func) { addCallbacks_##comp.push_back(func); } \
-  void State::registerRemCallback_##comp (CompOpCallback func) { remCallbacks_##comp.push_back(func); }
+  void State::registerAddCallback_##comp (EntNotifyDelegate& dlgt) { addCallbacks_##comp.push_back(dlgt); } \
+  void State::registerRemCallback_##comp (EntNotifyDelegate& dlgt) { remCallbacks_##comp.push_back(dlgt); }
 #define GEN_COMP_COLL_DEFN(comp) _COMP_COLL_DEFN(comp, SIG_##comp)
 
 #define GEN_COMP_DEFN_REQD(comp, flags) template<> compMask Component<comp>::requiredComps = flags; \
