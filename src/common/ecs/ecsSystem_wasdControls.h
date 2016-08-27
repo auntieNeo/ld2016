@@ -20,20 +20,23 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#ifndef ECSSYSTEM_MOVEMENT_H
-#define ECSSYSTEM_MOVEMENT_H
+#ifndef ECSSYSTEM_WASDCONTROLS_H
+#define ECSSYSTEM_WASDCONTROLS_H
 
+#include <SDL.h>
 #include "ecsSystem.h"
 
 namespace ecs {
   class WasdSystem : public System<WasdSystem> {
       friend class System;
-      std::vector<compMask> requiredComponents = {ENUM_LinearVel | ENUM_Orientation};
+      std::vector<compMask> requiredComponents = {ENUM_LinearVel | ENUM_Orientation | ENUM_WasdControls};
+      std::vector<SDL_Event> queuedEvents;
     public:
       WasdSystem(State* state);
       bool onInit();
       void onTick(float dt);
+      bool handleEvent(SDL_Event& event);
   };
 }
 
-#endif //ECSSYSTEM_MOVEMENT_H
+#endif //ECSSYSTEM_WASDCONTROLS_H

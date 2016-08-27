@@ -113,10 +113,10 @@ namespace ld2016 {
 
   void Game::m_initScene() {
     m_scene = new Scene();
-    m_scene->addObject(Debug::instance());
+    m_scene->addObject(Debug::instance(state));
   }
 
-  float Game::mainLoop() {
+  float Game::mainLoop(ecs::Delegate<bool(SDL_Event&)>& systemsHandler) {
     SDL_GL_SwapWindow(m_window);
 
     if (m_lastTime == 0.0f) {
@@ -127,6 +127,8 @@ namespace ld2016 {
     // Check for SDL events (user input, etc.)
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
+      if (systemsHandler(event))
+        continue;   // The systems have handled this event
       if (this->handleEvent(event))
         continue;  // Our derived class handled this event
       if (this->scene()->handleEvent(event))
@@ -163,7 +165,7 @@ namespace ld2016 {
     } else {
       // Draw the scene
       float aspect = (float)m_width / (float)m_height;
-//      m_scene->draw(*m_camera, aspect);
+      m_scene->draw(*m_camera, aspect);
     }
 
     return dt;

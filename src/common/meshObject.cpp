@@ -35,9 +35,9 @@
 #include "meshObject.h"
 
 namespace ld2016 {
-  MeshObject::MeshObject(
+  MeshObject::MeshObject( ecs::State& state,
       const std::string &meshFile,
-      const std::string &textureFile)
+      const std::string &textureFile) : SceneObject(state)
   {
     // Load the mesh from file using assimp
     m_loadMesh(meshFile);

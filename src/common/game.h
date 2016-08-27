@@ -28,6 +28,7 @@
 #include <SDL.h>
 #include <memory>
 #include "ecs/ecsState.h"
+#include "ecs/ecsSystem.h"
 
 namespace ld2016 {
   class Camera;
@@ -63,7 +64,7 @@ namespace ld2016 {
         return false;
       }
 
-      float mainLoop();
+      float mainLoop(ecs::Delegate<bool(SDL_Event&)>& systemsHandler);
   };
 }
 

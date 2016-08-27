@@ -53,27 +53,27 @@ namespace ld2016 {
     return m_children.find(address) != m_children.end();
   }
 
-
-  /*void SceneObject::m_tick(float dt) {
-    // Delegate the actual simulation to derived classes
-    this->tick(dt);
-
-    // FIXME: We should not be ticking all of the children, since we might have
-    // large compound objects that are static. Terrain is a good example of
-    // this.
-    // Tick all of our children
-    for (auto child : m_children) {
-      child.second->m_tick(dt);
-    }
-  }
   void SceneObject::m_draw(Transform &modelWorld, const glm::mat4 &worldView,
       const glm::mat4 &projection, float alpha, bool debug)
   {
     TransformRAII mw(modelWorld);
-    // Translate the object into position
-    mw *= glm::translate(glm::mat4(), this->position(alpha));
-    // Apply the object orientation as a rotation
-    mw *= glm::mat4_cast(this->orientation(alpha));
+
+    ecs::Existence* existence;
+    ecs::CompOpReturn status = state->getExistence(id, &existence);
+    assert(status == ecs::SUCCESS);
+
+    if (existence->flagIsOn(ecs::ENUM_Position)) {
+      ecs::Position *position;
+      state->getPosition(id, &position);
+      // Translate the object into position
+      mw *= glm::translate(glm::mat4(), position->getVec(alpha));
+    }
+    if (existence->flagIsOn(ecs::ENUM_Orientation)) {
+      ecs::Orientation *orientation;
+      state->getOrientation(id, &orientation);
+      // Apply the object orientation as a rotation
+      mw *= glm::mat4_cast(orientation->getQuat(alpha));
+    }
 
     // Delegate the actual drawing to derived classes
     this->draw(mw.peek(), worldView, projection, alpha, debug);
@@ -82,7 +82,13 @@ namespace ld2016 {
     for (auto child : m_children) {
       child.second->m_draw(mw, worldView, projection, alpha, debug);
     }
-  }*/
+  }
 
   bool SceneObject::handleEvent(const SDL_Event &event) { return false; }
+  void
+  SceneObject::draw(const glm::mat4 &modelWorld, const glm::mat4 &worldView, const glm::mat4 &projection, float alpha,
+                    bool debug) { }
+  ecs::entityId SceneObject::getId() const {
+    return id;
+  }
 }

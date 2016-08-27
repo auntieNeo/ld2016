@@ -43,6 +43,7 @@ namespace ecs {
       state->getOrientation(id, &oriComp);
       AngularVel* velComp;
       state->getAngularVel(id, &velComp);
+      oriComp->quat *= glm::slerp(glm::quat(), velComp->quat, 1000/dt);
       // TODO: apply angular velocity quat to orientation quat * dt
     }
   }

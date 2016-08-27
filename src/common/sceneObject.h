@@ -50,6 +50,12 @@ namespace ld2016 {
         std::shared_ptr<SceneObject>
         > m_children;
 
+      /**
+       * This method recursively draws this object and all of its children.
+       */
+      void m_draw(Transform &modelWorld, const glm::mat4 &worldView,
+                  const glm::mat4 &projection, float alpha, bool debug);
+
     protected:
       ecs::State* state;
       ecs::entityId id;
@@ -104,6 +110,34 @@ namespace ld2016 {
        * \return True if the given event was handled, and false otherwise.
        */
       virtual bool handleEvent(const SDL_Event &event);
+
+      /**
+       * Draws this scene object in the scene. The default behavior of this
+       * method is to draw nothing.
+       *
+       * \param modelWorld The model-space to world-space transform for this
+       * scene object's position and orientation.
+       * \param worldView The world-space to view-space transform for the
+       * position and orientation of the camera currently being used.
+       * \param projection The view-space to projection-space transform for
+       * the camera that is currently being used.
+       * \param alpha The simulation keyframe weight for animating this object
+       * between keyframes.
+       * \param debug Flag indicating whether or not debug information is to be
+       * drawn.
+       *
+       * Derived classes must implement this method in order for their scene
+       * objects to be visible.
+       */
+      virtual void draw(const glm::mat4 &modelWorld,
+                        const glm::mat4 &worldView, const glm::mat4 &projection,
+                        float alpha, bool debug);
+
+      /**
+       * Get ID
+       * @return id of this entity according to ECS
+       */
+      ecs::entityId getId() const;
   };
 }
 

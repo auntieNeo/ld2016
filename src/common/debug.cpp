@@ -214,9 +214,9 @@ namespace ld2016 {
     m_linesChanged = true;
   }
 
-  std::shared_ptr<Debug> Debug::instance() {
+  std::shared_ptr<Debug> Debug::instance(ecs::State& state) {
     static std::shared_ptr<Debug> instance = std::shared_ptr<Debug>(
-        new Debug());
+        new Debug(state));
     return instance;
   }
 

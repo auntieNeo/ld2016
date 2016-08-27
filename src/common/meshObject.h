@@ -49,7 +49,7 @@ namespace ld2016 {
           const glm::mat4 &modelView,
           const glm::mat4 &projection);
     public:
-      MeshObject(
+      MeshObject(ecs::State& state,
           const std::string &meshFile,
           const std::string &textureFile);
       virtual ~MeshObject();

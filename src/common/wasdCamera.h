@@ -25,10 +25,8 @@
 #ifndef LD2016_COMMON_WASD_CAMERA_H_
 #define LD2016_COMMON_WASD_CAMERA_H_
 
-#include <SDL.h>
-#include <map>
-
 #include "perspectiveCamera.h"
+#include "ecs/ecsState.h"
 
 namespace ld2016 {
   /**
@@ -37,24 +35,6 @@ namespace ld2016 {
    * first-person-shooter with noclip mode turned on.
    */
   class WasdCamera : public PerspectiveCamera {
-    private:
-      glm::vec3 m_accel, m_vel;
-
-      /**
-       * Reads keyboard state instantaneously and modifies acceleration vector accordingly
-       *
-       * \param dt The time in seconds between the last tick and the current
-       * tick.
-       */
-      void handleKeyState(float dt);
-
-      /**
-       * Applies acceleration vector and other effect to velocity
-       *
-       * \param dt The time in seconds between the last tick and the current
-       * tick.
-       */
-      void updateVelocity(float dt);
 
     public:
       /**
@@ -74,28 +54,8 @@ namespace ld2016 {
        * orientation should be pointed directly at the follow point with the
        * z-axis pointing up.
        */
-      WasdCamera(
-          float fovy, float near = 0.1f, float far = 1000.0f,
-          const glm::vec3 &position = glm::vec3(0.0f, 0.0f, 0.0f),
-          const glm::quat &orientation = glm::quat());
-
-      /**
-       * Handles keyboard and mouse events that control this WASD camera.
-       *
-       * \param event The SDL event structure for the current event.
-       * \return True if the given event was handled by the WASD camera, false
-       * otherwise.
-       */
-      bool handleEvent(const SDL_Event &event);
-
-      /**
-       * Implements the tick() method to move the camera according to user
-       * input.
-       *
-       * \param dt The time in seconds between the last tick and the current
-       * tick.
-       */
-      void tick(float dt);
+      WasdCamera(ecs::State& state, float fovy, float near, float far,
+                 const glm::vec3 &position, const glm::quat &orientation);
   };
 }
 

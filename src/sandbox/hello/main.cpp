@@ -27,15 +27,16 @@
 #include <emscripten.h>
 #endif
 
+#include "glm/gtc/quaternion.hpp"
 #include "../../common/debug.h"
 #include "../../common/scene.h"
 #include "../../common/wasdCamera.h"
 #include "../../common/game.h"
 #include "../../common/meshObject.h"
 
-#include "../../common/ecs/ecsState.h"
 #include "../../common/ecs/ecsHelpers.h"
 #include "../../common/ecs/ecsSystem_movement.h"
+#include "../../common/ecs/ecsSystem_wasdControls.h"
 
 using namespace ld2016;
 using namespace ecs;
@@ -44,70 +45,77 @@ class EcsDemo : public Game {
   private:
     std::shared_ptr<WasdCamera> m_camera;
     std::shared_ptr<MeshObject> m_mesh;
-    State state;
+    WasdSystem wasdSystem;
     MovementSystem movementSystem;
   public:
+    Delegate<bool(SDL_Event&)> systemsHandlerDlgt;
     EcsDemo(int argc, char **argv)
-        : Game(argc, argv, "Entity Component Sytem Demo"), movementSystem(&state) {
+        : Game(argc, argv, "Entity Component Sytem Demo"), wasdSystem(&state), movementSystem(&state) {
+      systemsHandlerDlgt = DELEGATE(&EcsDemo::systemsHandler, this);
+    }
+    EcsResult init() {
+      wasdSystem.init();
+      movementSystem.init();
+
       // Populate the graphics scene
       m_camera = std::shared_ptr<WasdCamera>(
-          new WasdCamera(
-              80.0f * ((float) M_PI / 180.0f),  // fovy
-              0.1f,  // near
-              100000.0f,  // far
-              glm::vec3(0.0f, 0.0f, 15.0f),  // position
-              glm::angleAxis(
-                  (float) M_PI / 4.0f,
-                  glm::vec3(1.0f, 0.0f, 0.0f))  // orientation
+          new WasdCamera( state,
+                          80.0f * ((float) M_PI / 180.0f),  // fovy
+                          0.1f,  // near
+                          100000.0f,  // far
+                          glm::vec3(0.0f, 0.0f, 15.0f),  // position
+                          glm::angleAxis(
+                              (float) M_PI / 4.0f,
+                              glm::vec3(1.0f, 0.0f, 0.0f))  // orientation
           ));
       this->scene()->addObject(m_camera);
       this->setCamera(m_camera);
       m_mesh = std::shared_ptr<MeshObject>(
-          new MeshObject(
-              "assets/models/sphere.dae",  // mesh
-              "assets/textures/rt_bunny.png"  // texture
+          new MeshObject( state,
+                          "assets/models/sphere.dae",  // mesh
+                          "assets/textures/rt_bunny.png"  // texture
           ));
       this->scene()->addObject(m_mesh);
       float delta = 0.3f;
       for (int i = 0; i < 100; ++i) {
-        Debug::drawLine(
-            glm::vec3((float) i * delta, 0.0f, 0.0f),
-            glm::vec3((float) i * delta, 1.0f, 0.0f),
-            glm::vec3(1.0f, 0.0f, 1.0f));
-        Debug::drawLine(
-            glm::vec3(0.0f, (float) i * delta, 0.0f),
-            glm::vec3(1.0f, (float) i * delta, 0.0f),
-            glm::vec3(1.0f, 0.0f, 1.0f));
+        Debug::drawLine( state,
+                         glm::vec3((float) i * delta, 0.0f, 0.0f),
+                         glm::vec3((float) i * delta, 1.0f, 0.0f),
+                         glm::vec3(1.0f, 0.0f, 1.0f));
+        Debug::drawLine( state,
+                         glm::vec3(0.0f, (float) i * delta, 0.0f),
+                         glm::vec3(1.0f, (float) i * delta, 0.0f),
+                         glm::vec3(1.0f, 0.0f, 1.0f));
       }
-    }
-    EcsResult initEcs() {
-      movementSystem.init();
 
-      CompOpReturn status;
-      entityId newId;
-      status = state.createEntity(&newId);
-      ECS_CHECK_ERR(status);
-      status = state.addPosition(newId, {0.f, 0.f, 1.f});
-      ECS_CHECK_ERR(status);
-      status = state.addLinearVel(newId, {0.f, 0.f, -0.000001f});
-      ECS_CHECK_ERR(status);
+      entityId meshId = m_mesh->getId();
+      state.addPosition(meshId, {0.f, 0.f, -2.f});
+      state.addLinearVel(meshId, {0.f, 0.f, 0.0000001f});
+      state.addOrientation(meshId, glm::quat());
+      state.addAngularVel(meshId, glm::rotate(glm::quat(), 0.1f, {0.f, 0.f, 1.f}));
 
       return ECS_SUCCESS;
     }
-    void tickEcs(float dt) {
+
+    bool systemsHandler(SDL_Event& event) {
+      return wasdSystem.handleEvent(event);
+    }
+
+    void tick(float dt) {
+      wasdSystem.tick(dt);
       movementSystem.tick(dt);
     }
 };
 
 void main_loop(void *instance) {
   EcsDemo *demo = (EcsDemo *) instance;
-  float dt = demo->mainLoop();
-  demo->tickEcs(dt);
+  float dt = demo->mainLoop(demo->systemsHandlerDlgt);
+  demo->tick(dt);
 }
 
 int main(int argc, char **argv) {
   EcsDemo demo(argc, argv);
-  EcsResult status = demo.initEcs();
+  EcsResult status = demo.init();
   if (status.isError()) { fprintf(stderr, "%s", status.toString().c_str()); }
 
 #ifdef __EMSCRIPTEN__

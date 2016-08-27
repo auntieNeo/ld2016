@@ -1,6 +1,7 @@
 /*
- * Copyright (c) 2016 Jonathan Glines
+ * Copyright (c) 2016 Jonathan Glines, Galen Cochrane
  * Jonathan Glines <jonathan@glines.net>
+ * Galen Cochrane <galencochrane@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -51,9 +52,6 @@ namespace ld2016 {
     status = state->getPosition(id, &position);
     assert(status == ecs::SUCCESS);
     wv *= glm::translate(glm::mat4(), -1.f * position->getVec(alpha));
-
-//    wv *= glm::mat4_cast(glm::inverse(this->orientation(alpha)));
-//    wv *= glm::translate(glm::mat4(), -1.0f * this->position(alpha));
 
     return wv;
   }

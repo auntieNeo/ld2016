@@ -1,6 +1,5 @@
 add_executable(hello
         main.cpp
-        orbitCamera.cpp orbitCamera.h
         )
 
 target_link_libraries(hello

@@ -45,13 +45,13 @@ namespace ecs {
   GEN_COMP_DEFN_REQD(Orientation, ENUM_Existence);
   GEN_COMP_DEFN_REQD(AngularVel, ENUM_Existence | ENUM_Orientation);
   GEN_COMP_DEFN_REQD(Perspective, ENUM_Existence | ENUM_Position | ENUM_Orientation);
-  GEN_COMP_DEFN_REQD(WasdControls, ENUM_Existence | ENUM_Position | ENUM_LinearVel | ENUM_Orientation | ENUM_AngularVel);
+  GEN_COMP_DEFN_REQD(WasdControls, ENUM_Existence | ENUM_Position | ENUM_LinearVel | ENUM_Orientation);
 
   GEN_COMP_DEFN_DEPN(Existence, ALL & ~ENUM_Existence);
   GEN_COMP_DEFN_DEPN(Position, ENUM_LinearVel | ENUM_Perspective | ENUM_WasdControls);
   GEN_COMP_DEFN_DEPN(LinearVel, ENUM_WasdControls);
   GEN_COMP_DEFN_DEPN(Orientation, ENUM_AngularVel | ENUM_Perspective | ENUM_WasdControls);
-  GEN_COMP_DEFN_DEPN(AngularVel, ENUM_WasdControls);
+  GEN_COMP_DEFN_DEPN(AngularVel, NONE);
   GEN_COMP_DEFN_DEPN(Perspective, NONE);
   GEN_COMP_DEFN_DEPN(WasdControls, NONE);
 

@@ -56,13 +56,6 @@ namespace ld2016 {
     return false;
   }
 
-  /*void Scene::tick(float dt) {
-    // Advance the simulation on all top-level scene objects
-    for (auto object : this->m_objects) {
-      object.second->m_tick(dt);
-    }
-  }
-
   void Scene::draw(const Camera &camera, float aspect,
       float alpha, bool debug) const
   {
@@ -84,5 +77,5 @@ namespace ld2016 {
           alpha,
           debug);
     }
-  }*/
+  }
 }

@@ -81,12 +81,6 @@ namespace ld2016 {
       bool handleEvent(const SDL_Event &event);
 
       /**
-       * Advances the simulation of the scene (and the simulations carried out
-       * by each scene object) forward by the given time interval in seconds.
-       */
-//      void tick(float dt);
-
-      /**
        * Draws the scene by recursively drawing all of its scene objects.
        *
        * \param camera The camera that dictates the world-view and projection
@@ -104,8 +98,8 @@ namespace ld2016 {
        * particular graphics API, it is the responsibility of the derived scene
        * objects to draw using the correct API.
        */
-//      void draw(const Camera &camera, float aspect,
-//          float alpha = 1.0, bool debug = false) const;
+      void draw(const Camera &camera, float aspect,
+          float alpha = 1.0, bool debug = false) const;
   };
 }
 

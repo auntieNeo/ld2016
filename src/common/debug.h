@@ -68,21 +68,23 @@ namespace ld2016 {
           const glm::vec3 &pos,
           const glm::vec3 &color);
     public:
-      static std::shared_ptr<Debug> instance();
+      static std::shared_ptr<Debug> instance(ecs::State& state);
 
       static void drawLine(
+          ecs::State& state,
           const glm::vec3 &a,
           const glm::vec3 &b,
           const glm::vec3 &color)
       {
-        instance()->m_drawLine(a, b, color);
+        instance(state)->m_drawLine(a, b, color);
       }
 
       static void drawPoint(
+          ecs::State& state,
           const glm::vec3 &pos,
           const glm::vec3 &color)
       {
-        instance()->m_drawPoint(pos, color);
+        instance(state)->m_drawPoint(pos, color);
       }
 
       void draw(const glm::mat4 &modelWorld,

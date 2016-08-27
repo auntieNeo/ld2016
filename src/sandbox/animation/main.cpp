@@ -34,126 +34,153 @@
 #include "../../common/scene.h"
 #include "../../common/wasdCamera.h"
 
+#include "../../common/ecs/ecsHelpers.h"
+#include "../../common/ecs/ecsSystem_movement.h"
+#include "../../common/ecs/ecsSystem_wasdControls.h"
+
 using namespace ld2016;
+using namespace ecs;
 
 class AnimationDemo : public Game {
   private:
     std::shared_ptr<WasdCamera> m_camera;
     std::shared_ptr<MeshObject> m_mesh;
+    WasdSystem wasdSystem;
+    MovementSystem movementSystem;
   public:
+    Delegate<bool(SDL_Event&)> systemsHandlerDlgt;
     AnimationDemo(int argc, char **argv)
-      : Game(argc, argv, "Animation Demo")
-    {
+        : Game(argc, argv, "Entity Component Sytem Demo"), wasdSystem(&state), movementSystem(&state) {
+      systemsHandlerDlgt = DELEGATE(&AnimationDemo::systemsHandler, this);
+    }
+    EcsResult init() {
+      wasdSystem.init();
+      movementSystem.init();
+
       // Populate the graphics scene
       m_camera = std::shared_ptr<WasdCamera>(
-          new WasdCamera(
-            80.0f * ((float)M_PI / 180.0f),  // fovy
-            0.1f,  // near
-            100000.0f,  // far
-            glm::vec3(0.0f, 0.0f, 15.0f),  // position
-            glm::angleAxis(
-              (float)M_PI / 4.0f,
-              glm::vec3(1.0f, 0.0f, 0.0f))  // orientation
-            ));
+          new WasdCamera( state,
+                          80.0f * ((float) M_PI / 180.0f),  // fovy
+                          0.1f,  // near
+                          100000.0f,  // far
+                          glm::vec3(0.0f, 0.0f, 15.0f),  // position
+                          glm::angleAxis(
+                              (float) M_PI / 4.0f,
+                              glm::vec3(1.0f, 0.0f, 0.0f))  // orientation
+          ));
       this->scene()->addObject(m_camera);
       this->setCamera(m_camera);
       m_mesh = std::shared_ptr<MeshObject>(
-          new MeshObject(
-            "assets/models/sphere.dae",  // mesh
-            "assets/textures/rt_bunny.png"  // texture
-            ));
+          new MeshObject( state,
+                          "assets/models/sphere.dae",  // mesh
+                          "assets/textures/rt_bunny.png"  // texture
+          ));
       this->scene()->addObject(m_mesh);
       float delta = 0.3f;
       for (int i = 0; i < 100; ++i) {
-        Debug::drawLine(
-            glm::vec3((float)i * delta, 0.0f, 0.0f),
-            glm::vec3((float)i * delta, 1.0f, 0.0f),
-            glm::vec3(1.0f, 0.0f, 1.0f));
-        Debug::drawLine(
-            glm::vec3(0.0f, (float)i * delta, 0.0f),
-            glm::vec3(1.0f, (float)i * delta, 0.0f),
-            glm::vec3(1.0f, 0.0f, 1.0f));
+        Debug::drawLine( state,
+                         glm::vec3((float) i * delta, 0.0f, 0.0f),
+                         glm::vec3((float) i * delta, 1.0f, 0.0f),
+                         glm::vec3(1.0f, 0.0f, 1.0f));
+        Debug::drawLine( state,
+                         glm::vec3(0.0f, (float) i * delta, 0.0f),
+                         glm::vec3(1.0f, (float) i * delta, 0.0f),
+                         glm::vec3(1.0f, 0.0f, 1.0f));
       }
 
-      Debug::drawLine(
+      entityId meshId = m_mesh->getId();
+      state.addPosition(meshId, {0.f, 0.f, -2.f});
+      state.addLinearVel(meshId, {0.f, 0.f, 0.0000001f});
+      state.addOrientation(meshId, glm::quat());
+      state.addAngularVel(meshId, glm::rotate(glm::quat(), 0.1f, {0.f, 0.f, 1.f}));
+
+      Debug::drawLine(state,
           glm::vec3(10 * delta, 0.f, 4.f),
           glm::vec3(11 * delta, 0.f, 2.f),
           glm::vec3(0.f, 1.f, 0.f));
-      Debug::drawLine(
+      Debug::drawLine(state,
           glm::vec3(11 * delta, 0.f, 2.f),
           glm::vec3(12 * delta, 0.f, 4.f),
           glm::vec3(0.f, 1.f, 0.f));
 
-      Debug::drawLine(
+      Debug::drawLine(state,
           glm::vec3(13 * delta, 0.f, 2.f),
           glm::vec3(13 * delta, 0.f, 4.f),
           glm::vec3(0.f, 1.f, 0.f));
 
-      Debug::drawLine(
+      Debug::drawLine(state,
           glm::vec3(14 * delta, 0.f, 2.f),
           glm::vec3(14 * delta, 0.f, 4.f),
           glm::vec3(0.f, 1.f, 0.f));
-      Debug::drawLine(
+      Debug::drawLine(state,
           glm::vec3(14 * delta, 0.f, 4.f),
           glm::vec3(15 * delta, 0.f, 3.5f),
           glm::vec3(0.f, 1.f, 0.f));
-      Debug::drawLine(
+      Debug::drawLine(state,
           glm::vec3(15 * delta, 0.f, 3.5f),
           glm::vec3(14 * delta, 0.f, 3.f),
           glm::vec3(0.f, 1.f, 0.f));
-      Debug::drawLine(
+      Debug::drawLine(state,
           glm::vec3(14 * delta, 0.f, 3.f),
           glm::vec3(15 * delta, 0.f, 2.f),
           glm::vec3(0.f, 1.f, 0.f));
 
-      Debug::drawLine(
+      Debug::drawLine(state,
           glm::vec3(16 * delta, 0.f, 2.f),
           glm::vec3(16 * delta, 0.f, 4.f),
           glm::vec3(0.f, 1.f, 0.f));
-      Debug::drawLine(
+      Debug::drawLine(state,
           glm::vec3(16 * delta, 0.f, 2.f),
           glm::vec3(17 * delta, 0.f, 2.f),
           glm::vec3(0.f, 1.f, 0.f));
-      Debug::drawLine(
+      Debug::drawLine(state,
           glm::vec3(17 * delta, 0.f, 2.f),
           glm::vec3(17 * delta, 0.f, 4.f),
           glm::vec3(0.f, 1.f, 0.f));
 
-      Debug::drawLine(
+      Debug::drawLine(state,
           glm::vec3(19 * delta, 0.f, 4.f),
           glm::vec3(18 * delta, 0.f, 3.3f),
           glm::vec3(0.f, 1.f, 0.f));
-      Debug::drawLine(
+      Debug::drawLine(state,
           glm::vec3(18 * delta, 0.f, 3.3f),
           glm::vec3(19 * delta, 0.f, 2.6f),
           glm::vec3(0.f, 1.f, 0.f));
-      Debug::drawLine(
+      Debug::drawLine(state,
           glm::vec3(19 * delta, 0.f, 2.6f),
           glm::vec3(18 * delta, 0.f, 2.f),
           glm::vec3(0.f, 1.f, 0.f));
+      return ECS_SUCCESS;
+    }
+    bool systemsHandler(SDL_Event& event) {
+      return wasdSystem.handleEvent(event);
+    }
+    void tick(float dt) {
+      wasdSystem.tick(dt);
+      movementSystem.tick(dt);
     }
 };
 
-AnimationDemo *demo;
-
-void main_loop() {
-  demo->mainLoop();
+void main_loop(void *instance) {
+  AnimationDemo *demo = (AnimationDemo *) instance;
+  float dt = demo->mainLoop(demo->systemsHandlerDlgt);
+  demo->tick(dt);
 }
 
 int main(int argc, char **argv) {
-  demo = new AnimationDemo(argc, argv);
+  AnimationDemo demo(argc, argv);
+  EcsResult status = demo.init();
+  if (status.isError()) { fprintf(stderr, "%s", status.toString().c_str()); }
 
 #ifdef __EMSCRIPTEN__
     emscripten_set_main_loop(main_loop, 0, 1);
 #else
     while (1) {
-      main_loop();
+      main_loop(&demo);
       // TODO: Wait for VSync? Or should we poll input faster than that?
     }
 #endif
 
-  // FIXME: This can never be reached if the demo object calls exit()
-  delete demo;
 
   return EXIT_SUCCESS;
 }
