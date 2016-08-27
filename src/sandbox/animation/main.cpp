@@ -27,6 +27,7 @@
 #include <emscripten.h>
 #endif
 
+#include "../../common/animatedObject.h"
 #include "../../common/debug.h"
 #include "../../common/game.h"
 #include "../../common/meshObject.h"
@@ -39,6 +40,7 @@ class AnimationDemo : public Game {
   private:
     std::shared_ptr<WasdCamera> m_camera;
     std::shared_ptr<MeshObject> m_mesh;
+    std::shared_ptr<AnimatedObject> m_animatedMesh;
   public:
     AnimationDemo(int argc, char **argv)
       : Game(argc, argv, "Animation Demo")
@@ -56,12 +58,20 @@ class AnimationDemo : public Game {
             ));
       this->scene()->addObject(m_camera);
       this->setCamera(m_camera);
+      /*
       m_mesh = std::shared_ptr<MeshObject>(
           new MeshObject(
             "assets/models/sphere.dae",  // mesh
             "assets/textures/rt_bunny.png"  // texture
             ));
       this->scene()->addObject(m_mesh);
+      */
+      m_animatedMesh = std::shared_ptr<AnimatedObject>(
+          new AnimatedObject(
+            "assets/models/human_strange.dae",  // mesh
+            "assets/textures/cucumber.png"  // texture
+            ));
+      this->scene()->addObject(m_animatedMesh);
       float delta = 0.3f;
       for (int i = 0; i < 100; ++i) {
         Debug::drawLine(

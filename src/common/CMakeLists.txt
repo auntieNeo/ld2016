@@ -1,4 +1,5 @@
 add_library(common STATIC
+    animatedObject.cpp
     camera.cpp
     debug.cpp
     game.cpp

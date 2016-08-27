@@ -22,20 +22,14 @@
  * IN THE SOFTWARE.
  */
 
-#include <assimp/Importer.hpp>
-#include <assimp/postprocess.h>
-#include <assimp/scene.h>
-#include <glm/gtc/type_ptr.hpp>
-#include "stb_image.h"
+#include <cstdlib>
 
-#include "glError.h"
-#include "shaderProgram.h"
-#include "shaders.h"
+#include "debug.h"
 
-#include "meshObject.h"
+#include "animatedObject.h"
 
 namespace ld2016 {
-  MeshObject::MeshObject(
+  AnimatedObject::AnimatedObject(
       const std::string &meshFile,
       const std::string &textureFile)
   {
@@ -45,10 +39,10 @@ namespace ld2016 {
     m_loadTexture(textureFile);
   }
 
-  MeshObject::~MeshObject() {
+  AnimatedObject::~AnimatedObject() {
   }
 
-  void MeshObject::m_loadMesh(const std::string &meshFile) {
+  void AnimatedObject::m_loadMesh(const std::string &meshFile) {
     Assimp::Importer importer;
     auto scene = importer.ReadFile(
         meshFile,
@@ -84,7 +78,38 @@ namespace ld2016 {
       vertices[i].norm[2] = aim->mNormals[i].z;
       vertices[i].tex[0] = aim->mTextureCoords[0][i].x;
       vertices[i].tex[1] = aim->mTextureCoords[0][i].y;
-      /*
+      for (int j = 0; j < 4; ++j) {
+        vertices[i].weights[j] = 0.0f;
+        vertices[i].bones[j] = -1;
+      }
+    }
+    // Collect the bone weights with the most influence
+    for (int i = 0; i < aim->mNumBones; ++i) {
+      auto bone = aim->mBones[i];
+      fprintf(stderr, "Bone name: '%s'\n",
+          bone->mName.C_Str());
+      for (int j = 0; j < bone->mNumWeights; ++j) {
+        auto vertexId = bone->mWeights[j].mVertexId;
+        auto weight = bone->mWeights[j].mWeight;
+        auto vertex = &vertices[vertexId];
+        // Look at all of this vertex's existing bone weights
+        for (int k = 0; k < 4; ++k) {
+          if (vertex->weights[k] < weight) {
+            // Insert this bone into this position
+            for (int l = 3; l > k; --l) {
+              vertex->weights[l] = vertex->weights[l - 1];
+              vertex->bones[l] = vertex->bones[l - 1];
+            }
+            vertex->weights[k] = weight;
+            vertex->bones[k] = i;
+            break;
+          }
+        }
+      }
+    }
+    // XXX: Print out the vertices for debugging
+    /*
+    for (int i = 0; i < aim->mNumVertices; ++i) {
       fprintf(stderr,
           "vertices[%d]:\n"
           "  pos: (%g, %g, %g)\n"
@@ -99,8 +124,16 @@ namespace ld2016 {
           vertices[i].norm[2],
           vertices[i].tex[0],
           vertices[i].tex[1]);
-          */
+      fprintf(stderr,
+          "  bones:\n");
+      for (int j = 0; j < 4; ++j) {
+        fprintf(stderr,
+            "    bone[%d]: %g\n",
+            vertices[i].bones[j],
+            vertices[i].weights[j]);
+      }
     }
+    */
     // Copy the vertices buffer to the GL
     glGenBuffers(1, &m_vertexBuffer);
     FORCE_ASSERT_GL_ERROR();
@@ -136,13 +169,67 @@ namespace ld2016 {
     FORCE_ASSERT_GL_ERROR();
     delete[] indices;
     m_numIndices = aim->mNumFaces * 3;
+    // TODO: Store all of the animations, including all channels of each
+    // animation
+    // TODO: Read the animation into a buffer
+    // TODO: Recursively traverse the scene nodes
+    m_traverseNodeHierarchy(scene->mRootNode, aim, glm::mat4(1.0f), 0);
   }
 
-  void MeshObject::m_loadTexture(const std::string &textureFile) {
+  void AnimatedObject::m_traverseNodeHierarchy(
+      const aiNode *node,
+      const aiMesh *mesh,
+      glm::mat4 transform,
+      int level)
+  {
+    fprintf(stderr, "node: %s\n", node->mName.C_Str());
+    transform *= m_aiMatrixToGlmMat(node->mTransformation);
+
+    glm::vec3 start, end;
+    start = glm::vec3(transform * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    end = glm::vec3(transform * glm::vec4(0.1f, 0.0f, 0.0f, 1.0f));
+    Debug::drawLine(start, end, glm::vec3(1.0f, 1.0f, 0.0f));
+
+    /* TODO: Look for the bone that uses this node */
+    for (int i = 0; i < mesh->mNumBones; ++i) {
+      auto bone = mesh->mBones[i];
+      if (strcmp(node->mName.C_Str(), bone->mName.C_Str()) == 0) {
+        fprintf(stderr, "bone: %s\n",
+            bone->mName.C_Str());
+      }
+    }
+    for (int i = 0; i < node->mNumChildren; ++i) {
+      m_traverseNodeHierarchy(node->mChildren[i], mesh, transform, level + 1);
+    }
+  }
+
+  glm::mat4 AnimatedObject::m_aiMatrixToGlmMat(const aiMatrix4x4 &in) {
+    glm::mat4 out;
+    out[0][0] = in.a1;
+    out[1][0] = in.a2;
+    out[2][0] = in.a3;
+    out[3][0] = in.a4;
+    out[0][1] = in.b1;
+    out[1][1] = in.b2;
+    out[2][1] = in.b3;
+    out[3][1] = in.b4;
+    out[0][2] = in.c1;
+    out[1][2] = in.c2;
+    out[2][2] = in.c3;
+    out[3][2] = in.c4;
+    out[0][3] = in.d1;
+    out[1][3] = in.d2;
+    out[2][3] = in.d3;
+    out[3][3] = in.d4;
+    return out;
+  }
+
+  void AnimatedObject::m_loadTexture(const std::string &textureFile) {
     int x, y, n;
     uint8_t* data = stbi_load(textureFile.c_str(), &x, &y, &n, 0);
     if (!data) {
-      fprintf(stderr, "Failed to load texture file '%s'.\n", textureFile.c_str());
+      fprintf(stderr, "Failed to load texture file '%s'.\n",
+          textureFile.c_str());
     }
     // Create the texture object in the GL
     glGenTextures(1, &m_texture);
@@ -169,7 +256,11 @@ namespace ld2016 {
     stbi_image_free(data);
   }
 
-  void MeshObject::m_drawSurface(
+  void AnimatedObject::m_updateBoneMatrices(float time) {
+    // TODO: Traverse the bone hierarchy
+  }
+
+  void AnimatedObject::m_drawSurface(
       const glm::mat4 &modelView,
       const glm::mat4 &projection)
   {
@@ -263,12 +354,19 @@ namespace ld2016 {
     ASSERT_GL_ERROR();
   }
 
-  void MeshObject::draw(const glm::mat4 &modelWorld,
+  void AnimatedObject::tick(float dt) {
+    m_lastTime = m_time;
+    m_time += dt;
+  }
+
+  void AnimatedObject::draw(const glm::mat4 &modelWorld,
       const glm::mat4 &worldView, const glm::mat4 &projection,
       float alpha, bool debug)
   {
     glm::mat4 modelView = worldView * modelWorld;
 
+    m_updateBoneMatrices(
+        (1.0f - alpha) * m_lastTime + alpha * m_time);
     m_drawSurface(modelView, projection);
   }
 }
