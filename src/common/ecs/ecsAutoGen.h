@@ -175,9 +175,9 @@
         CompOpReturn State::get##comp(const entityId id, comp** out) { getComp(comps_##comp, id, out); }*/
 #define _COMP_COLL_DEFN(comp, ...) \
   CompOpReturn State::add##comp(const entityId& id GEN_ARG_NAMES_TYPED(__VA_ARGS__)) \
-                              { addComp(comps_##comp, id, addCallbacks_##comp GEN_ARG_NAMES(__VA_ARGS__)); }\
-  CompOpReturn State::rem##comp(const entityId& id) { remComp(comps_##comp, id, remCallbacks_##comp); }\
-  CompOpReturn State::get##comp(const entityId& id, comp** out) { getComp(comps_##comp, id, out); } \
+                              { return addComp(comps_##comp, id, addCallbacks_##comp GEN_ARG_NAMES(__VA_ARGS__)); }\
+  CompOpReturn State::rem##comp(const entityId& id) { return remComp(comps_##comp, id, remCallbacks_##comp); }\
+  CompOpReturn State::get##comp(const entityId& id, comp** out) { return getComp(comps_##comp, id, out); } \
   void State::registerAddCallback_##comp (EntNotifyDelegate& dlgt) { addCallbacks_##comp.push_back(dlgt); } \
   void State::registerRemCallback_##comp (EntNotifyDelegate& dlgt) { remCallbacks_##comp.push_back(dlgt); }
 #define GEN_COMP_COLL_DEFN(comp) _COMP_COLL_DEFN(comp, SIG_##comp)
