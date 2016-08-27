@@ -37,8 +37,15 @@
 namespace ld2016 {
   MeshObject::MeshObject( ecs::State& state,
       const std::string &meshFile,
-      const std::string &textureFile) : SceneObject(state)
+      const std::string &textureFile,
+      const glm::vec3& position,
+      const glm::quat& orientation) : SceneObject(state)
   {
+//    ecs::CompOpReturn status;
+//    status = this->state->addPosition(id, position);
+//    assert(status == ecs::SUCCESS);
+//    status = this->state->addOrientation(id, orientation);
+//    assert(status == ecs::SUCCESS);
     // Load the mesh from file using assimp
     m_loadMesh(meshFile);
     // Load the texture from file using SDL2
@@ -138,6 +145,7 @@ namespace ld2016 {
 
   void MeshObject::m_loadTexture(const std::string &textureFile) {
     int x, y, n;
+    stbi_set_flip_vertically_on_load(true);
     uint8_t* data = stbi_load(textureFile.c_str(), &x, &y, &n, 0);
     if (!data) {
       fprintf(stderr, "Failed to load texture file '%s'.\n", textureFile.c_str());

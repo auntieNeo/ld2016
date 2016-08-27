@@ -29,6 +29,14 @@
 
 namespace ecs {
 
+  #if !SDL_VERSION_ATLEAST(2, 0, 4)
+  SDL_Window *grabbedWindow = nullptr;
+
+  SDL_Window *SDL_GetGrabbedWindow() {
+    return grabbedWindow;
+  }
+  #endif
+
   WasdSystem::WasdSystem(State *state) : System(state) {
 
   }
@@ -109,15 +117,6 @@ namespace ecs {
     }
   }
 
-  #if !SDL_VERSION_ATLEAST(3, 0, 0)
-  SDL_Window *grabbedWindow = nullptr;
-
-  SDL_Window *SDL_GetGrabbedWindow() {
-    return grabbedWindow;
-  }
-
-  #endif
-
   bool WasdSystem::handleEvent(SDL_Event &event) {
     switch (event.type) {
       case SDL_MOUSEBUTTONDOWN:
@@ -129,7 +128,7 @@ namespace ecs {
             break;
           // Grab the mouse cursor
           SDL_SetWindowGrab(window, SDL_TRUE);
-          #if (!SDL_VERSION_ATLEAST(3, 0, 0))
+          #if (!SDL_VERSION_ATLEAST(2, 0, 4))
             grabbedWindow = window;
           #endif
           SDL_SetRelativeMouseMode(SDL_TRUE);
@@ -147,7 +146,7 @@ namespace ecs {
               break;
             // Release the mouse cursor from the window on escape pressed
             SDL_SetWindowGrab(window, SDL_FALSE);
-            #if !SDL_VERSION_ATLEAST(3, 0, 0)
+            #if !SDL_VERSION_ATLEAST(2, 0, 4)
             grabbedWindow = nullptr;
             #endif
             SDL_SetRelativeMouseMode(SDL_FALSE);

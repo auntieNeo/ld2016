@@ -51,7 +51,9 @@ namespace ld2016 {
     public:
       MeshObject(ecs::State& state,
           const std::string &meshFile,
-          const std::string &textureFile);
+          const std::string &textureFile,
+          const glm::vec3& position = glm::vec3(),
+          const glm::quat& orientation = glm::quat());
       virtual ~MeshObject();
 
       virtual void draw(const glm::mat4 &modelWorld,
