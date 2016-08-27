@@ -173,7 +173,7 @@ int main(int argc, char **argv) {
   if (status.isError()) { fprintf(stderr, "%s", status.toString().c_str()); }
 
 #ifdef __EMSCRIPTEN__
-    emscripten_set_main_loop(main_loop, 0, 1);
+    emscripten_set_main_loop_arg(main_loop, (void*)&demo, 0, 1);
 #else
     while (1) {
       main_loop(&demo);
