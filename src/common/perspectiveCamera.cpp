@@ -27,12 +27,12 @@
 #include "perspectiveCamera.h"
 
 namespace ld2016 {
-  PerspectiveCamera::PerspectiveCamera(float fovy, float near, float far,
+  PerspectiveCamera::PerspectiveCamera(ecs::State& state, float fovy, float near, float far,
       const glm::vec3 &position, const glm::quat &orientation)
-    : Camera(position, orientation),
-      m_fovy(fovy), m_prevFovy(fovy),
-      m_near(near), m_far(far)
+    : Camera(position, orientation, state)
   {
+    ecs::CompOpReturn status = this->state->addPerspective(id, fovy, near, far);
+    assert(status == ecs::SUCCESS);
   }
 
   PerspectiveCamera::~PerspectiveCamera() {
@@ -41,13 +41,31 @@ namespace ld2016 {
   glm::mat4 PerspectiveCamera::projection(
       float aspect, float alpha) const
   {
-    // Linearly interpolate changes in FOV between ticks
-    float fovy = (1.0f - alpha) * m_prevFovy + alpha * m_fovy;
+    ecs::Perspective* perspective;
+    ecs::CompOpReturn status = state->getPerspective(id, &perspective);
+    assert(status == ecs::SUCCESS);
 
-    return glm::perspective(fovy, aspect, m_near, m_far);
+    // Linearly interpolate changes in FOV between ticks
+    float fovy = (1.0f - alpha) * perspective->prevFovy + alpha * perspective->fovy;
+    return glm::perspective(fovy, aspect, perspective->near, perspective->far);
   }
 
   float PerspectiveCamera::focalLength() const {
-    return 1.0f / tan(0.5f * m_fovy);
+    ecs::Perspective* perspective;
+    ecs::CompOpReturn status = state->getPerspective(id, &perspective);
+    assert(status == ecs::SUCCESS);
+    return 1.0f / tan(0.5f * perspective->fovy);
+  }
+  void PerspectiveCamera::setFar(float far) {
+    ecs::Perspective* perspective;
+    ecs::CompOpReturn status = state->getPerspective(id, &perspective);
+    assert(status == ecs::SUCCESS);
+    perspective->far = far;
+  }
+  float PerspectiveCamera::fovy() const {
+    ecs::Perspective* perspective;
+    ecs::CompOpReturn status = state->getPerspective(id, &perspective);
+    assert(status == ecs::SUCCESS);
+    return perspective->fovy;
   }
 }

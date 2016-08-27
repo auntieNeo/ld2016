@@ -29,6 +29,7 @@
 #include <vector>
 
 #include "sceneObject.h"
+#include "ecs/ecsState.h"
 
 namespace ld2016 {
   class Debug : public SceneObject {
@@ -48,7 +49,7 @@ namespace ld2016 {
 
       GLuint m_lineBuffer, m_pointBuffer;
 
-      Debug();
+      Debug(ecs::State& state);
 
       void m_updateLines();
       void m_updatePoints();

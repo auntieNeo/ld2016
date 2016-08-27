@@ -25,15 +25,13 @@
 #define LD2016_COMMON_PERSPECTIVE_CAMERA_H_
 
 #include "camera.h"
+#include "ecs/ecsState.h"
 
 namespace ld2016 {
   /**
    * A camera object with perspective projection.
    */
   class PerspectiveCamera : public Camera {
-    private:
-      float m_fovy, m_prevFovy,
-            m_near, m_far;
     public:
       /**
        * Constructs a perspective camera object with the given parameters.
@@ -50,12 +48,12 @@ namespace ld2016 {
        * orientation should be pointed directly at the follow point with the
        * z-axis pointing up.
        */
-      PerspectiveCamera(float fovy, float near = 0.1f, float far = 1000.0f,
+      PerspectiveCamera(ecs::State& state, float fovy, float near = 0.1f, float far = 1000.0f,
           const glm::vec3 &position = glm::vec3(0.0f, 0.0f, 0.0f),
           const glm::quat &orientation = glm::quat());
       virtual ~PerspectiveCamera();
 
-      void setFar(float far) { m_far = far; }
+      void setFar(float far);
 
       /**
        * Implements a perspective projection for this camera object.
@@ -71,7 +69,7 @@ namespace ld2016 {
 
       float focalLength() const;
 
-      float fovy() const { return m_fovy; }
+      float fovy() const;
   };
 }
 

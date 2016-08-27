@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2016 Jonathan Glines, Galen Cochrane
- * Jonathan Glines <jonathan@glines.net>
+ * Copyright (c) 2016 Galen Cochrane
  * Galen Cochrane <galencochrane@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,50 +20,20 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
+#ifndef ECSSYSTEM_MOVEMENT_H
+#define ECSSYSTEM_MOVEMENT_H
 
-#ifndef LD2016_COMMON_GAME_H_
-#define LD2016_COMMON_GAME_H_
-#include <GL/glew.h>
-#include <SDL.h>
-#include <memory>
-#include "ecs/ecsState.h"
+#include "ecsSystem.h"
 
-namespace ld2016 {
-  class Camera;
-  class Scene;
-  class Game {
-    private:
-      const char *m_windowTitle;
-      SDL_Window *m_window;
-      SDL_GLContext m_glContext;
-      int m_width, m_height;
-      Scene *m_scene;
-      std::shared_ptr<Camera> m_camera;
-      float m_lastTime;
-
-      void m_initSdl();
-      void m_initGl();
-      void m_initScene();
-    protected:
-      ecs::State state;
-
+namespace ecs {
+  class WasdSystem : public System<WasdSystem> {
+      friend class System;
+      std::vector<compMask> requiredComponents = {ENUM_LinearVel | ENUM_Orientation};
     public:
-      Game(int argc, char **argv, const char *windowTitle);
-      virtual ~Game();
-
-      int width() const { return m_width; }
-      int height() const { return m_height; }
-      float aspect() const { return (float)m_width / (float)m_height; }
-      Scene *scene() { return m_scene; }
-
-      void setCamera(std::shared_ptr<Camera> camera) { m_camera = camera; }
-
-      virtual bool handleEvent(const SDL_Event &event) {
-        return false;
-      }
-
-      float mainLoop();
+      WasdSystem(State* state);
+      bool onInit();
+      void onTick(float dt);
   };
 }
 
-#endif
+#endif //ECSSYSTEM_MOVEMENT_H

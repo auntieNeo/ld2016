@@ -139,6 +139,8 @@ namespace ld2016 {
               m_height = event.window.data2;
               glViewport(0, 0, m_width, m_height);
               break;
+            default:
+              break;
           }
           break;
         case SDL_QUIT:
@@ -151,7 +153,7 @@ namespace ld2016 {
     float dt = currentTime - m_lastTime;
     m_lastTime = currentTime;
     // Advance the scene simulation.
-    m_scene->tick(dt);
+//    m_scene->tick(dt);
 
     // Draw the window
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -161,7 +163,7 @@ namespace ld2016 {
     } else {
       // Draw the scene
       float aspect = (float)m_width / (float)m_height;
-      m_scene->draw(*m_camera, aspect);
+//      m_scene->draw(*m_camera, aspect);
     }
 
     return dt;

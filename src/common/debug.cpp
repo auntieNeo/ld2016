@@ -29,8 +29,8 @@
 #include "shaders.h"
 
 namespace ld2016 {
-  Debug::Debug()
-    : SceneObject(glm::vec3(0.0f), glm::quat()),
+  Debug::Debug(ecs::State& state)
+    : SceneObject(state),
     m_linesChanged(true)
   {
     glGenBuffers(1, &m_lineBuffer);

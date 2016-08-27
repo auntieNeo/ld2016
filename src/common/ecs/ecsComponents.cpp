@@ -44,24 +44,24 @@ namespace ecs {
   GEN_COMP_DEFN_REQD(LinearVel, ENUM_Existence | ENUM_Position);
   GEN_COMP_DEFN_REQD(Orientation, ENUM_Existence);
   GEN_COMP_DEFN_REQD(AngularVel, ENUM_Existence | ENUM_Orientation);
-  GEN_COMP_DEFN_REQD(CameraView, ENUM_Existence | ENUM_Position | ENUM_Orientation);
+  GEN_COMP_DEFN_REQD(Perspective, ENUM_Existence | ENUM_Position | ENUM_Orientation);
   GEN_COMP_DEFN_REQD(WasdControls, ENUM_Existence | ENUM_Position | ENUM_LinearVel | ENUM_Orientation | ENUM_AngularVel);
 
   GEN_COMP_DEFN_DEPN(Existence, ALL & ~ENUM_Existence);
-  GEN_COMP_DEFN_DEPN(Position, ENUM_LinearVel | ENUM_CameraView | ENUM_WasdControls);
+  GEN_COMP_DEFN_DEPN(Position, ENUM_LinearVel | ENUM_Perspective | ENUM_WasdControls);
   GEN_COMP_DEFN_DEPN(LinearVel, ENUM_WasdControls);
-  GEN_COMP_DEFN_DEPN(Orientation, ENUM_AngularVel | ENUM_CameraView | ENUM_WasdControls);
+  GEN_COMP_DEFN_DEPN(Orientation, ENUM_AngularVel | ENUM_Perspective | ENUM_WasdControls);
   GEN_COMP_DEFN_DEPN(AngularVel, ENUM_WasdControls);
-  GEN_COMP_DEFN_DEPN(CameraView, NONE);
+  GEN_COMP_DEFN_DEPN(Perspective, NONE);
   GEN_COMP_DEFN_DEPN(WasdControls, NONE);
 
   /*
    * The following area is for the definitions of any component methods you create. Make sure that constructor
    * parameters match the 'SIG_[component_type]' define you provided with the declaration of the component.
    * TODO: Add any and all component member method definitions here.
-   * NOTE: Generally there shouldn't be methods except the constructor. Game logic ought to go in the systems instead.
-   * Sometimes its convenient to put helper methods in some components, however (like matrix calculators in a camera
-   * component or something).
+   * NOTE: Generally there shouldn't be many methods except the constructor. Game logic ought to go in the systems..
+   * Sometimes its convenient to put helper methods in some components, however (like the interpolating getters in
+   * the Position and Orientation components), so those are probably ok.
    */
   bool Existence::flagIsOn(int compType) {
     return (compType & componentsPresent) != NONE;
@@ -79,11 +79,17 @@ namespace ecs {
     componentsPresent &= ~mask;
   }
   Position::Position(glm::vec3 vec) : vec(vec) {}
+  glm::vec3 Position::getVec(float alpha) {
+    return glm::mix(lastVec, vec, alpha);
+  }
   LinearVel::LinearVel(glm::vec3 vec) : vec(vec) {}
   Orientation::Orientation(glm::quat quat) : quat(quat) {}
+  glm::quat Orientation::getQuat(float alpha) {
+    return glm::slerp(lastQuat, quat, alpha);
+  }
   AngularVel::AngularVel(glm::quat quat) : quat(quat) {}
-  CameraView::CameraView(float fovy, float near, float far, float aspect)
-      : fovy(fovy), near(near), far(far), aspect(aspect) {}
+  Perspective::Perspective(float fovy, float near, float far)
+      : fovy(fovy), prevFovy(fovy), near(near), far(far) {}
 
   /*
    * This macro defines these function:

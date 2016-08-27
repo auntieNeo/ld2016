@@ -54,8 +54,9 @@ namespace ecs {
   };
   #define SIG_Position glm::vec3
   struct Position : public Component<Position> {
-    glm::vec3 vec;
+    glm::vec3 vec, lastVec;
     Position(glm::vec3 vec);
+    glm::vec3 getVec(float alpha);
   };
   #define SIG_LinearVel glm::vec3
   struct LinearVel : public Component<LinearVel> {
@@ -64,18 +65,20 @@ namespace ecs {
   };
   #define SIG_Orientation glm::quat
   struct Orientation : public Component<Orientation> {
-    glm::quat quat;
+    glm::quat quat, lastQuat;
     Orientation(glm::quat quat);
+    glm::quat getQuat(float alpha);
   };
   #define SIG_AngularVel glm::quat
   struct AngularVel : public Component<AngularVel> {
     glm::quat quat;
     AngularVel(glm::quat quat);
   };
-  #define SIG_CameraView float, float, float, float
-  struct CameraView : public Component<CameraView> {
-    float fovy, near, far, aspect;
-    CameraView(float fovy, float near, float far, float aspect);
+  #define SIG_Perspective float, float, float
+  struct Perspective : public Component<Perspective> {
+    float fovy, prevFovy,
+          near, far;
+    Perspective(float fovy, float near, float far);
   };
   #define SIG_WasdControls
   struct WasdControls : public Component<WasdControls> {
@@ -92,7 +95,7 @@ namespace ecs {
     LinearVel,      \
     Orientation,    \
     AngularVel,     \
-    CameraView,     \
+    Perspective,    \
     WasdControls
 
   #define GEN_COLL_DECLS \
@@ -101,7 +104,7 @@ namespace ecs {
     GEN_COMP_COLL_DECL(LinearVel)   \
     GEN_COMP_COLL_DECL(Orientation) \
     GEN_COMP_COLL_DECL(AngularVel)  \
-    GEN_COMP_COLL_DECL(CameraView)  \
+    GEN_COMP_COLL_DECL(Perspective)  \
     GEN_COMP_COLL_DECL(WasdControls)
 
   #define GEN_COLL_DEFNS \
@@ -110,7 +113,7 @@ namespace ecs {
     GEN_COMP_COLL_DEFN(LinearVel)   \
     GEN_COMP_COLL_DEFN(Orientation) \
     GEN_COMP_COLL_DEFN(AngularVel)  \
-    GEN_COMP_COLL_DEFN(CameraView)  \
+    GEN_COMP_COLL_DEFN(Perspective)  \
     GEN_COMP_COLL_DEFN(WasdControls)
 
   /*

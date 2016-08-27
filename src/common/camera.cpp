@@ -26,9 +26,13 @@
 #include "camera.h"
 
 namespace ld2016 {
-  Camera::Camera(const glm::vec3 &position, const glm::quat &orientation)
-    : SceneObject(position, orientation)
+  Camera::Camera(const glm::vec3 &position, const glm::quat &orientation, ecs::State& state) : SceneObject(state)
   {
+    ecs::CompOpReturn status;
+    status = this->state->addPosition(id, position);
+    assert(status == ecs::SUCCESS);
+    status = this->state->addOrientation(id, orientation);
+    assert(status == ecs::SUCCESS);
   }
 
   Camera::~Camera() {
@@ -39,8 +43,17 @@ namespace ld2016 {
 
     // Translate the world so the camera is positioned in the center, and then
     // rotate the world to be aligned with the camera's orientation
-    wv *= glm::mat4_cast(glm::inverse(this->orientation(alpha)));
-    wv *= glm::translate(glm::mat4(), -1.0f * this->position(alpha));
+    ecs::Orientation* orientation;
+    ecs::CompOpReturn status = state->getOrientation(id, &orientation);
+    assert(status == ecs::SUCCESS);
+    wv *= glm::mat4_cast(glm::inverse(orientation->getQuat(alpha)));
+    ecs::Position* position;
+    status = state->getPosition(id, &position);
+    assert(status == ecs::SUCCESS);
+    wv *= glm::translate(glm::mat4(), -1.f * position->getVec(alpha));
+
+//    wv *= glm::mat4_cast(glm::inverse(this->orientation(alpha)));
+//    wv *= glm::translate(glm::mat4(), -1.0f * this->position(alpha));
 
     return wv;
   }

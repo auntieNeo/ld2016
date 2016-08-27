@@ -1,6 +1,7 @@
 /*
- * Copyright (c) 2016 Jonathan Glines
+ * Copyright (c) 2016 Jonathan Glines, Galen Cochrane
  * Jonathan Glines <jonathan@glines.net>
+ * Galen Cochrane <galencochrane@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -28,16 +29,32 @@
 #include "sceneObject.h"
 
 namespace ld2016 {
-  SceneObject::SceneObject(
-      const glm::vec3 &position, const glm::quat &orientation)
-    : m_position(position), m_prevPosition(position),
-      m_orientation(orientation), m_prevOrientation(orientation)
-  {
+  SceneObject::SceneObject(ecs::State& state) : state(&state) {
+    ecs::CompOpReturn status;
+    status = this->state->createEntity(&id);
+    assert(status == ecs::SUCCESS);
+  }
+  SceneObject::~SceneObject() {
+    ecs::CompOpReturn status;
+    status = state->deleteEntity(id);
+    assert(status == ecs::SUCCESS);
+  }
+  void SceneObject::addChild(std::shared_ptr<SceneObject> child) {
+    m_children.insert({child.get(), child});
+  }
+  void SceneObject::removeChild(const SceneObject *address) {
+    auto iterator = m_children.find(address);
+    assert(iterator != m_children.end());
+    // TODO: Set the m_parent member of this child to nullptr (SceneObjects
+    // do not have m_parent members at the time of this writing).
+    m_children.erase(iterator);
+  }
+  bool SceneObject::hasChild(const SceneObject *address) {
+    return m_children.find(address) != m_children.end();
   }
 
-  SceneObject::~SceneObject() {
-  }
-  void SceneObject::m_tick(float dt) {
+
+  /*void SceneObject::m_tick(float dt) {
     // Delegate the actual simulation to derived classes
     this->tick(dt);
 
@@ -49,7 +66,6 @@ namespace ld2016 {
       child.second->m_tick(dt);
     }
   }
-
   void SceneObject::m_draw(Transform &modelWorld, const glm::mat4 &worldView,
       const glm::mat4 &projection, float alpha, bool debug)
   {
@@ -66,13 +82,7 @@ namespace ld2016 {
     for (auto child : m_children) {
       child.second->m_draw(mw, worldView, projection, alpha, debug);
     }
-  }
+  }*/
 
-  void SceneObject::removeChild(const SceneObject *address) {
-    auto iterator = m_children.find(address);
-    assert(iterator != m_children.end());
-    // TODO: Set the m_parent member of this child to nullptr (SceneObjects
-    // do not have m_parent members at the time of this writing).
-    m_children.erase(iterator);
-  }
+  bool SceneObject::handleEvent(const SDL_Event &event) { return false; }
 }

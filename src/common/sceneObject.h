@@ -1,6 +1,7 @@
 /*
- * Copyright (c) 2016 Jonathan Glines
+ * Copyright (c) 2016 Jonathan Glines, Galen Cochrane
  * Jonathan Glines <jonathan@glines.net>
+ * Galen Cochrane <galencochrane@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -29,6 +30,7 @@
 #include <glm/gtc/quaternion.hpp>
 #include <memory>
 #include <unordered_map>
+#include "ecs/ecsState.h"
 
 namespace ld2016 {
   class Transform;
@@ -43,25 +45,14 @@ namespace ld2016 {
   class SceneObject {
     friend class Scene;
     private:
-      glm::vec3 m_position, m_prevPosition;
-      glm::quat m_orientation, m_prevOrientation;
-
       std::unordered_map<
         const SceneObject *,
         std::shared_ptr<SceneObject>
         > m_children;
 
-      /**
-       * This method recursively advances the simulation of this object and all
-       * of its children by dt seconds.
-       */
-      void m_tick(float dt);
-
-      /**
-       * This method recursively draws this object and all of its children.
-       */
-      void m_draw(Transform &modelWorld, const glm::mat4 &worldView,
-          const glm::mat4 &projection, float alpha, bool debug);
+    protected:
+      ecs::State* state;
+      ecs::entityId id;
 
     public:
       /**
@@ -70,56 +61,12 @@ namespace ld2016 {
        * \param position The position of the scene object.
        * \param orientation The orientation of the scene object.
        */
-      SceneObject(
-          const glm::vec3 &position = glm::vec3(0.0f),
-          const glm::quat &orientation = glm::quat());
+      SceneObject(ecs::State& state);
       /**
        * Destroys this scene object. Since SceneObject is a polymorphic class,
        * this destructor is virtual.
        */
       virtual ~SceneObject();
-
-      /**
-       * Returns the position of this scene object. The \p alpha parameter
-       * facilitates linear interpolation of the animation between keyframes of
-       * an object's position for times in-between scene simulation ticks.
-       *
-       * \param alpha The weight between simulation keyframe ticks.
-       * \return The weighted position of this scene object.
-       */
-      glm::vec3 position(float alpha = 1.0f) const {
-        return glm::mix(m_prevPosition, m_position, alpha);
-      }
-      /**
-       * Sets the position of this scene object for the current scene
-       * simulation tick.
-       *
-       * \param position The position to set.
-       */
-      void setPosition(const glm::vec3 &position) {
-        m_position = position;
-      }
-
-      /**
-       * Returns the orientation of this scene object. The \p alpha parameter
-       * facilitates SLERP interpolation of the animation between keyframes of
-       * an object's orientation for times in-between scene simulation ticks.
-       *
-       * \param alpha The weight between simulation keyframe ticks.
-       * \return The weighted orietation of this scene object.
-       */
-      glm::quat orientation(float alpha = 1.0f) const {
-        return glm::slerp(m_prevOrientation, m_orientation, alpha);
-      }
-      /**
-       * Sets the orientation of this scene object for the current scene
-       * simulation tick.
-       *
-       * \param orientation The orientation to set.
-       */
-      void setOrientation(const glm::quat &orientation) {
-        m_orientation = orientation;
-      }
 
       /**
        * Adds a scene object as a child of this scene object.
@@ -128,18 +75,14 @@ namespace ld2016 {
        *
        * \sa removeChild()
        */
-      void addChild(std::shared_ptr<SceneObject> child) {
-        m_children.insert({child.get(), child});
-      }
+      void addChild(std::shared_ptr<SceneObject> child);
 
       /**
        * \param The address of the child scene object to look for.
        * \return True if a scene object with the given address is a child of
        * this node, false otherwise.
        */
-      bool hasChild(const SceneObject *address) {
-        return m_children.find(address) != m_children.end();
-      }
+      bool hasChild(const SceneObject *address);
 
       /**
        * Removes the child of this scene object with the given address.
@@ -160,38 +103,7 @@ namespace ld2016 {
        * \param event The current SDL event to be considered.
        * \return True if the given event was handled, and false otherwise.
        */
-      virtual bool handleEvent(const SDL_Event &event) { return false; }
-
-      /**
-       * Advances the simulation of this scene object. Derived classes can
-       * implement this method to give scene objects different behavior in
-       * time.
-       *
-       * \param dt The delta time between the last tick and this current tick.
-       */
-      virtual void tick(float dt) {};
-
-      /**
-       * Draws this scene object in the scene. The default behavior of this
-       * method is to draw nothing.
-       *
-       * \param modelWorld The model-space to world-space transform for this
-       * scene object's position and orientation.
-       * \param worldView The world-space to view-space transform for the
-       * position and orientation of the camera currently being used.
-       * \param projection The view-space to projection-space transform for
-       * the camera that is currently being used.
-       * \param alpha The simulation keyframe weight for animating this object
-       * between keyframes.
-       * \param debug Flag indicating whether or not debug information is to be
-       * drawn.
-       *
-       * Derived classes must implement this method in order for their scene
-       * objects to be visible.
-       */
-      virtual void draw(const glm::mat4 &modelWorld,
-          const glm::mat4 &worldView, const glm::mat4 &projection,
-          float alpha, bool debug) {}
+      virtual bool handleEvent(const SDL_Event &event);
   };
 }
 
