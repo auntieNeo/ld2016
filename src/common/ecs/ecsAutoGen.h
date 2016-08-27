@@ -20,12 +20,22 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
+
+/**
+ * This file contains a bunch of scary macros that allow for the automatic generation of code within
+ * ecsComponents.h and .cpp and ecsState.h and .cpp
+ *
+ * It is not advised that you try to follow them all the way through unless you have intimate knowledge of
+ * variadic macros and tricks like for-each macros.
+ *
+ * A much more friendly interface for editing components is found in ecsComponents.h and .cpp
+ */
 #ifndef ECS_AUTOGEN_H
 #define ECS_AUTOGEN_H
 
 #include <stdint.h>
 
-  // Provides variadic argument count
+// Provides variadic argument count
 #define _GET_ARG_N(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, \
                   _19, _20, _21, _22, _23, _24, _25, _26, _27, _28, _29, _30, _31, _32, _33, _N, ...) _N
 
