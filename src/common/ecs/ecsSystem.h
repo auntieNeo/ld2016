@@ -80,7 +80,7 @@ namespace ecs {
         EntNotifyDelegate{ DELEGATE_NOCLASS(forget), sys().requiredComponents[i], &registeredIDs[i] }
       );
     }
-    sys().onInit();
+    return sys().onInit();
   }
   template<typename Derived_System>
   void System<Derived_System>::tick(float dt) {

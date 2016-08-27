@@ -54,8 +54,8 @@ class AnimationDemo : public Game {
       systemsHandlerDlgt = DELEGATE(&AnimationDemo::systemsHandler, this);
     }
     EcsResult init() {
-      wasdSystem.init();
-      movementSystem.init();
+      assert(wasdSystem.init());
+      assert(movementSystem.init());
 
       // Populate the graphics scene
       m_camera = std::shared_ptr<WasdCamera>(
