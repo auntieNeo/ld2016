@@ -58,9 +58,7 @@ namespace ld2016 {
       /**
        * Adds the given scene object to the top level of this graphics scene.
        */
-      void addObject(std::shared_ptr<SceneObject> object) {
-        this->m_objects.insert({object.get(), object});
-      }
+      void addObject(std::shared_ptr<SceneObject> object);
 
       /**
        * Locates the scene object with the given memory address and removes
@@ -86,7 +84,7 @@ namespace ld2016 {
        * Advances the simulation of the scene (and the simulations carried out
        * by each scene object) forward by the given time interval in seconds.
        */
-      void tick(float dt);
+//      void tick(float dt);
 
       /**
        * Draws the scene by recursively drawing all of its scene objects.
@@ -106,8 +104,8 @@ namespace ld2016 {
        * particular graphics API, it is the responsibility of the derived scene
        * objects to draw using the correct API.
        */
-      void draw(const Camera &camera, float aspect,
-          float alpha = 1.0, bool debug = false) const;
+//      void draw(const Camera &camera, float aspect,
+//          float alpha = 1.0, bool debug = false) const;
   };
 }
 

@@ -36,6 +36,10 @@ namespace ld2016 {
     // TODO
   }
 
+  void Scene::addObject(std::shared_ptr<SceneObject> object) {
+    this->m_objects.insert({object.get(), object});
+  }
+
   void Scene::removeObject(const SceneObject *address) {
     auto iterator = m_objects.find(address);
     assert(iterator != m_objects.end());
@@ -52,7 +56,7 @@ namespace ld2016 {
     return false;
   }
 
-  void Scene::tick(float dt) {
+  /*void Scene::tick(float dt) {
     // Advance the simulation on all top-level scene objects
     for (auto object : this->m_objects) {
       object.second->m_tick(dt);
@@ -80,5 +84,5 @@ namespace ld2016 {
           alpha,
           debug);
     }
-  }
+  }*/
 }

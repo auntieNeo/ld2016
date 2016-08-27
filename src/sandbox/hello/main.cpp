@@ -33,9 +33,9 @@
 #include "../../common/game.h"
 #include "../../common/meshObject.h"
 
-#include "ecs/ecsState.h"
-#include "ecs/ecsHelpers.h"
-#include "ecs/ecsSystem_movement.h"
+#include "../../common/ecs/ecsState.h"
+#include "../../common/ecs/ecsHelpers.h"
+#include "../../common/ecs/ecsSystem_movement.h"
 
 using namespace ld2016;
 using namespace ecs;

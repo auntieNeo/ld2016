@@ -48,7 +48,7 @@ namespace ld2016 {
        * \param position The position of the camera object.
        * \param orientation The orientation of the camera object.
        */
-      Camera(const glm::vec3 &position, const glm::quat &orientation);
+      Camera(const glm::vec3 &position, const glm::quat &orientation, ecs::State& state);
       /**
        * Destroys the camera object. Since Camera is a polymorphic class, this
        * destructor is virtual.

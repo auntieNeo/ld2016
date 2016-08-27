@@ -1,3 +1,5 @@
+add_subdirectory(ecs)
+
 add_library(common STATIC
     camera.cpp
     debug.cpp
@@ -14,6 +16,10 @@ add_library(common STATIC
     transformRAII.cpp
     transformStack.cpp
     wasdCamera.cpp
+    )
+
+target_link_libraries(common
+    ecs
     )
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)

@@ -1,5 +1,3 @@
-add_subdirectory("./ecs")
-
 add_executable(hello
         main.cpp
         orbitCamera.cpp orbitCamera.h
