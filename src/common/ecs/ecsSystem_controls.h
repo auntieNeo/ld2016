@@ -27,12 +27,15 @@
 #include "ecsSystem.h"
 
 namespace ecs {
-  class WasdSystem : public System<WasdSystem> {
+  class ControlSystem : public System<ControlSystem> {
       friend class System;
-      std::vector<compMask> requiredComponents = {ENUM_LinearVel | ENUM_Orientation | ENUM_WasdControls};
+      std::vector<compMask> requiredComponents = {
+          ENUM_Orientation | ENUM_MouseControls,
+          ENUM_LinearVel | ENUM_Orientation | ENUM_WasdControls
+      };
       std::vector<SDL_Event> queuedEvents;
     public:
-      WasdSystem(State* state);
+      ControlSystem(State* state);
       bool onInit();
       void onTick(float dt);
       bool handleEvent(SDL_Event& event);

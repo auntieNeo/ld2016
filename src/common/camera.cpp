@@ -41,8 +41,10 @@ namespace ld2016 {
 
   glm::mat4 Camera::worldView(float alpha) const {
     glm::mat4 wv;
+    reverseTransformLookup(wv, alpha);
+//    wv = glm::inverse(wv);
 
-    // Translate the world so the camera is positioned in the center, and then
+    /*// Translate the world so the camera is positioned in the center, and then
     // rotate the world to be aligned with the camera's orientation
     ecs::Orientation* orientation;
     ecs::CompOpReturn status = state->getOrientation(id, &orientation);
@@ -51,7 +53,7 @@ namespace ld2016 {
     ecs::Position* position;
     status = state->getPosition(id, &position);
     assert(status == ecs::SUCCESS);
-    wv *= glm::translate(glm::mat4(), -1.f * position->getVec(alpha));
+    wv *= glm::translate(glm::mat4(), -1.f * position->getVec(alpha));*/
 
     return wv;
   }

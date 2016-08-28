@@ -24,12 +24,14 @@
 #define ECS_COMPONENTS_H
 
 #include "ecsAutoGen.h"
+#include "ecsDelegate.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
 namespace ecs {
 
   typedef uint32_t compMask;
+  typedef uint32_t entityId;
 
   template <typename Derived>
   struct Component {
@@ -63,6 +65,16 @@ namespace ecs {
     glm::vec3 vec;
     LinearVel(glm::vec3 vec);
   };
+  #define SIG_Scale glm::vec3
+  struct Scale : public Component<Scale> {
+    glm::vec3 vec, lastVec;
+    Scale(glm::vec3 vec);
+  };
+  #define SIG_ScalarMultFunc Delegate<glm::vec3(const glm::vec3&, uint32_t time)>
+  struct ScalarMultFunc : public Component<ScalarMultFunc> {
+    Delegate<glm::vec3(const glm::vec3&, uint32_t time)> multByFuncOfTime;
+    ScalarMultFunc(Delegate<glm::vec3(const glm::vec3&, uint32_t time)> func);
+  };
   #define SIG_Orientation glm::quat
   struct Orientation : public Component<Orientation> {
     glm::quat quat, lastQuat;
@@ -80,9 +92,20 @@ namespace ecs {
           near, far;
     Perspective(float fovy, float near, float far);
   };
-  #define SIG_WasdControls
+  #define SIG_WasdControls entityId, WasdControls::Style
   struct WasdControls : public Component<WasdControls> {
+    enum Style {
+      ROTATE_ALL_AXES, ROTATE_ABOUT_Z
+    };
     glm::vec3 accel;
+    entityId orientationProxy;
+    int style;
+    WasdControls(entityId orientationProxy, Style style);
+  };
+  #define SIG_MouseControls bool, bool
+  struct MouseControls : public Component<MouseControls> {
+    bool invertedX, invertedY;
+    MouseControls(bool invertedX, bool invertedY);
   };
 
   /*
@@ -93,28 +116,37 @@ namespace ecs {
     Existence,      \
     Position,       \
     LinearVel,      \
+    Scale,          \
+    ScalarMultFunc, \
     Orientation,    \
     AngularVel,     \
     Perspective,    \
-    WasdControls
+    WasdControls,   \
+    MouseControls
 
   #define GEN_COLL_DECLS \
-    GEN_COMP_COLL_DECL(Existence)   \
-    GEN_COMP_COLL_DECL(Position)    \
-    GEN_COMP_COLL_DECL(LinearVel)   \
-    GEN_COMP_COLL_DECL(Orientation) \
-    GEN_COMP_COLL_DECL(AngularVel)  \
-    GEN_COMP_COLL_DECL(Perspective)  \
-    GEN_COMP_COLL_DECL(WasdControls)
+    GEN_COMP_COLL_DECL(Existence)     \
+    GEN_COMP_COLL_DECL(Position)      \
+    GEN_COMP_COLL_DECL(LinearVel)     \
+    GEN_COMP_COLL_DECL(Scale)         \
+    GEN_COMP_COLL_DECL(ScalarMultFunc)\
+    GEN_COMP_COLL_DECL(Orientation)   \
+    GEN_COMP_COLL_DECL(AngularVel)    \
+    GEN_COMP_COLL_DECL(Perspective)   \
+    GEN_COMP_COLL_DECL(WasdControls)  \
+    GEN_COMP_COLL_DECL(MouseControls)
 
   #define GEN_COLL_DEFNS \
-    GEN_COMP_COLL_DEFN(Existence)   \
-    GEN_COMP_COLL_DEFN(Position)    \
-    GEN_COMP_COLL_DEFN(LinearVel)   \
-    GEN_COMP_COLL_DEFN(Orientation) \
-    GEN_COMP_COLL_DEFN(AngularVel)  \
-    GEN_COMP_COLL_DEFN(Perspective)  \
-    GEN_COMP_COLL_DEFN(WasdControls)
+    GEN_COMP_COLL_DEFN(Existence)     \
+    GEN_COMP_COLL_DEFN(Position)      \
+    GEN_COMP_COLL_DEFN(LinearVel)     \
+    GEN_COMP_COLL_DEFN(Scale)         \
+    GEN_COMP_COLL_DEFN(ScalarMultFunc)\
+    GEN_COMP_COLL_DEFN(Orientation)   \
+    GEN_COMP_COLL_DEFN(AngularVel)    \
+    GEN_COMP_COLL_DEFN(Perspective)   \
+    GEN_COMP_COLL_DEFN(WasdControls)  \
+    GEN_COMP_COLL_DEFN(MouseControls)
 
   /*
    * This macro does the following:

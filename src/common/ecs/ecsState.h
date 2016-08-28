@@ -33,7 +33,6 @@
 
 namespace ecs {
 
-  typedef uint32_t entityId;
   struct EntNotifyDelegate {
     Delegate<void(const entityId&, void* data)> dlgt;
     compMask likeness;

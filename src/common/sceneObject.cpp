@@ -41,6 +41,7 @@ namespace ld2016 {
   }
   void SceneObject::addChild(std::shared_ptr<SceneObject> child) {
     m_children.insert({child.get(), child});
+    child.get()->m_parent = this;
   }
   void SceneObject::removeChild(const SceneObject *address) {
     auto iterator = m_children.find(address);
@@ -82,6 +83,28 @@ namespace ld2016 {
     for (auto child : m_children) {
       child.second->m_draw(mw, worldView, projection, alpha, debug);
     }
+  }
+
+  void SceneObject::reverseTransformLookup(glm::mat4 &wv, float alpha) const {
+
+    ecs::Existence* existence;
+    ecs::CompOpReturn status = state->getExistence(id, &existence);
+
+    if (existence->flagIsOn(ecs::ENUM_Orientation)) {
+      ecs::Orientation *orientation;
+      state->getOrientation(id, &orientation);
+      wv *= glm::mat4_cast(glm::inverse(orientation->getQuat(alpha)));
+    }
+    if (existence->flagIsOn(ecs::ENUM_Position)) {
+      ecs::Position *position;
+      state->getPosition(id, &position);
+      wv *= glm::translate(glm::mat4(), -1.f * position->getVec(alpha));
+    }
+
+    if (m_parent != NULL) {
+      m_parent->reverseTransformLookup(wv, alpha);
+    }
+
   }
 
   bool SceneObject::handleEvent(const SDL_Event &event) { return false; }
