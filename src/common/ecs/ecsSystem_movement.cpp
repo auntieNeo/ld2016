@@ -20,6 +20,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
+#include <SDL_timer.h>
 #include "ecsSystem_movement.h"
 
 namespace ecs {
@@ -43,8 +44,19 @@ namespace ecs {
       state->getOrientation(id, &oriComp);
       AngularVel* velComp;
       state->getAngularVel(id, &velComp);
-      oriComp->quat *= glm::slerp(glm::quat(), velComp->quat, 1000/dt);
-      // TODO: apply angular velocity quat to orientation quat * dt
+      glm::quat noRotation = glm::angleAxis(0.f, glm::vec3(0.f, 0.f, 1.f));
+      /*float partOfRotation = 1000 / dt;
+      if (partOfRotation == 0.f) { continue; }
+      oriComp->quat *= glm::slerp(noRotation, velComp->quat, partOfRotation);*/
+      oriComp->quat *= velComp->quat;
+      // FIXME: This may be causing things to occasionally disappear??? Or is it something else?
+    }
+    for (auto id : registeredIDs[2]) {
+      Scale* scale;
+      state->getScale(id, &scale);
+      ScalarMultFunc* scalarMultFunc;
+      state->getScalarMultFunc(id, &scalarMultFunc);
+      scale->vec = scalarMultFunc->multByFuncOfTime(scale->lastVec, SDL_GetTicks());
     }
   }
 }

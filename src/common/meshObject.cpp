@@ -26,6 +26,7 @@
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include "stb_image.h"
 
 #include "glError.h"
@@ -35,17 +36,17 @@
 #include "meshObject.h"
 
 namespace ld2016 {
-  MeshObject::MeshObject( ecs::State& state,
-      const std::string &meshFile,
-      const std::string &textureFile,
-      const glm::vec3& position,
-      const glm::quat& orientation) : SceneObject(state)
+  MeshObject::MeshObject(ecs::State &state, const std::string &meshFile, const std::string &textureFile,
+                           const glm::vec3 &position, const glm::quat &orientation, const glm::vec3 &scale)
+      : SceneObject(state)
   {
-//    ecs::CompOpReturn status;
-//    status = this->state->addPosition(id, position);
-//    assert(status == ecs::SUCCESS);
-//    status = this->state->addOrientation(id, orientation);
-//    assert(status == ecs::SUCCESS);
+    ecs::CompOpReturn status;
+    status = this->state->addPosition(id, position);
+    assert(status == ecs::SUCCESS);
+    status = this->state->addOrientation(id, orientation);
+    assert(status == ecs::SUCCESS);
+    status = this->state->addScale(id, scale);
+    assert(status == ecs::SUCCESS);
     // Load the mesh from file using assimp
     m_loadMesh(meshFile);
     // Load the texture from file using SDL2
@@ -91,7 +92,7 @@ namespace ld2016 {
       vertices[i].norm[2] = aim->mNormals[i].z;
       vertices[i].tex[0] = aim->mTextureCoords[0][i].x;
       vertices[i].tex[1] = aim->mTextureCoords[0][i].y;
-      fprintf(stderr,
+      /*fprintf(stderr,
           "vertices[%d]:\n"
           "  pos: (%g, %g, %g)\n"
           "  norm: (%g, %g, %g)\n"
@@ -104,7 +105,7 @@ namespace ld2016 {
           vertices[i].norm[1],
           vertices[i].norm[2],
           vertices[i].tex[0],
-          vertices[i].tex[1]);
+          vertices[i].tex[1]);*/
     }
     // Copy the vertices buffer to the GL
     glGenBuffers(1, &m_vertexBuffer);
@@ -259,6 +260,7 @@ namespace ld2016 {
 
     // Draw the surface
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+    glBindTexture(GL_TEXTURE_2D, m_texture);
     ASSERT_GL_ERROR();
     glDrawElements(
         GL_TRIANGLES,  // mode
@@ -273,8 +275,9 @@ namespace ld2016 {
       const glm::mat4 &worldView, const glm::mat4 &projection,
       float alpha, bool debug)
   {
-    glm::mat4 modelView = worldView * modelWorld;
-
+    ecs::Scale* scale;
+    state->getScale(id, &scale);
+    glm::mat4 modelView = worldView * modelWorld * glm::scale(glm::mat4(), scale->vec);
     m_drawSurface(modelView, projection);
   }
 }

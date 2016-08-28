@@ -20,7 +20,9 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#include "ecsSystem_wasdControls.h"
+#include "ecsSystem_controls.h"
+#include "glm/gtx/transform.hpp"
+#include "glm/gtx/matrix_decompose.hpp"
 
 #define WASD_MAX_VELOCITY 0.00001f
 #define WASD_ACCELERATION 0.0001f
@@ -37,10 +39,10 @@ namespace ecs {
   }
   #endif
 
-  WasdSystem::WasdSystem(State *state) : System(state) {
+  ControlSystem::ControlSystem(State *state) : System(state) {
 
   }
-  bool WasdSystem::onInit() {
+  bool ControlSystem::onInit() {
     return true;
   }
   template<typename lastKeyCode>
@@ -51,14 +53,12 @@ namespace ecs {
   static bool anyPressed(const Uint8 *keyStates, firstKeyCode firstKey, keyCode... keys) {
     return keyStates[firstKey] || anyPressed(keyStates, keys...);
   }
-  void WasdSystem::onTick(float dt) {
+  void ControlSystem::onTick(float dt) {
     for (auto id : registeredIDs[0]) {
-      WasdControls* wasdControls;
-      state->getWasdControls(id, &wasdControls);
+      MouseControls* mouseControls;
+      state->getMouseControls(id, &mouseControls);
       Orientation* orientation;
       state->getOrientation(id, &orientation);
-      LinearVel* linearVel;
-      state->getLinearVel(id, &linearVel);
 
       for (auto event : queuedEvents) {
         switch(event.type) {
@@ -73,10 +73,12 @@ namespace ecs {
               // delta
               glm::quat rotation;
               orientation->quat = glm::angleAxis(
-                  -(float) event.motion.xrel * MOUSE_SENSITIVITY * ((float) M_PI / 180.0f),
+                  (float)event.motion.xrel * MOUSE_SENSITIVITY * ((float) M_PI / 180.0f) *
+                      (mouseControls->invertedX ? 1.f : -1.f),
                   glm::vec3(0.0f, 0.0f, 1.0f)) * orientation->quat;
               orientation->quat = orientation->quat * glm::angleAxis(
-                  -(float) event.motion.yrel * MOUSE_SENSITIVITY * ((float) M_PI / 180.0f),
+                  (float)event.motion.yrel * MOUSE_SENSITIVITY * ((float) M_PI / 180.0f) *
+                      (mouseControls->invertedY ? 1.f : -1.f),
                   glm::vec3(1.0f, 0.0f, 0.0f));
             }
             break;
@@ -85,7 +87,21 @@ namespace ecs {
             break;
         }
       }
-      queuedEvents.clear();
+    }
+    for (auto id : registeredIDs[1]) {
+      WasdControls* wasdControls;
+      state->getWasdControls(id, &wasdControls);
+      Orientation* orientation;
+      if (wasdControls->orientationProxy == 0) {
+        state->getOrientation(id, &orientation);
+      } else {
+        CompOpReturn status = state->getOrientation(wasdControls->orientationProxy, &orientation);
+        if (status != SUCCESS) {
+          continue;
+        }
+      }
+      LinearVel* linearVel;
+      state->getLinearVel(id, &linearVel);
 
       // zero out acceleration
       wasdControls->accel = glm::vec3();
@@ -93,16 +109,34 @@ namespace ecs {
       // Get current keyboard state and apply actions accordingly
       const Uint8 *keyStates = SDL_GetKeyboardState(NULL);
       #define DO_ON_KEYS(action, ...) if(anyPressed(keyStates, __VA_ARGS__)) { action; }
-      DO_ON_KEYS(wasdControls->accel += glm::vec3(0.0f, 0.0f, -1.0f), SDL_SCANCODE_W, SDL_SCANCODE_UP)
-      DO_ON_KEYS(wasdControls->accel += glm::vec3(0.0f, 0.0f, 1.0f), SDL_SCANCODE_S, SDL_SCANCODE_DOWN)
-      DO_ON_KEYS(wasdControls->accel += glm::vec3(-1.0f, 0.0f, 0.0f), SDL_SCANCODE_A, SDL_SCANCODE_LEFT)
-      DO_ON_KEYS(wasdControls->accel += glm::vec3(1.0f, 0.0f, 0.0f), SDL_SCANCODE_D, SDL_SCANCODE_RIGHT)
-      DO_ON_KEYS(wasdControls->accel += glm::vec3(0.0f, -1.0f, 0.0f), SDL_SCANCODE_LCTRL, SDL_SCANCODE_LSHIFT)
-      DO_ON_KEYS(wasdControls->accel += glm::vec3(0.0f, 1.0f, 0.0f), SDL_SCANCODE_SPACE)
+      DO_ON_KEYS(wasdControls->accel += glm::vec3( 0.0f,  1.0f,  0.0f), SDL_SCANCODE_W, SDL_SCANCODE_UP)
+      DO_ON_KEYS(wasdControls->accel += glm::vec3( 0.0f, -1.0f,  0.0f), SDL_SCANCODE_S, SDL_SCANCODE_DOWN)
+      DO_ON_KEYS(wasdControls->accel += glm::vec3(-1.0f,  0.0f,  0.0f), SDL_SCANCODE_A, SDL_SCANCODE_LEFT)
+      DO_ON_KEYS(wasdControls->accel += glm::vec3( 1.0f,  0.0f,  0.0f), SDL_SCANCODE_D, SDL_SCANCODE_RIGHT)
+      DO_ON_KEYS(wasdControls->accel += glm::vec3( 0.0f,  0.0f, -1.0f), SDL_SCANCODE_LCTRL, SDL_SCANCODE_LSHIFT)
+      DO_ON_KEYS(wasdControls->accel += glm::vec3( 0.0f,  0.0f,  1.0f), SDL_SCANCODE_SPACE)
       #undef DO_ON_KEYS
 
+      glm::quat quat = orientation->getQuat(1.0);
+      glm::mat3 rotMat;
+      switch (wasdControls->style) {
+        case WasdControls::ROTATE_ABOUT_Z: {
+          glm::vec3 axis = glm::vec3(0.f, 0.f, 1.f);
+          glm::vec3 orth0 = glm::vec3(0.f, 1.0, 0.f);
+          glm::vec3 transformed = quat * orth0;
+          glm::vec3 projected = transformed - (glm::dot(transformed, axis) * axis);
+          projected = glm::normalize(projected);
+          float rotZ = acosf(glm::dot(orth0, projected)) * (transformed.x < 0.f ? 1.f : -1.f);
+          rotMat = glm::mat3(glm::rotate(rotZ, glm::vec3(0.f, 0.f, 1.f)));
+          break;
+        }
+        case WasdControls::ROTATE_ALL_AXES:
+          rotMat = glm::mat3_cast(quat);
+        default:
+          break;
+      }
       // Rotate the movement axis to the correct orientation
-      wasdControls->accel = glm::mat3_cast(orientation->getQuat(1.0)) * wasdControls->accel;
+      wasdControls->accel = rotMat * wasdControls->accel;
       if (length(wasdControls->accel) > 0.0f) {
         wasdControls->accel = WASD_ACCELERATION * glm::normalize(wasdControls->accel);
       }
@@ -115,9 +149,10 @@ namespace ecs {
       // Apply simple brakes
       linearVel->vec *= std::min(1.f, WASD_FRICTION_INVERSE / dt);
     }
+    queuedEvents.clear();
   }
 
-  bool WasdSystem::handleEvent(SDL_Event &event) {
+  bool ControlSystem::handleEvent(SDL_Event &event) {
     switch (event.type) {
       case SDL_MOUSEBUTTONDOWN:
         // Make sure the window has grabbed the mouse cursor

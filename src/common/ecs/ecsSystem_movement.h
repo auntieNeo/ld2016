@@ -28,7 +28,10 @@
 namespace ecs {
   class MovementSystem : public System<MovementSystem> {
       friend class System;
-      std::vector<compMask> requiredComponents = {ENUM_Position | ENUM_LinearVel, ENUM_Orientation | ENUM_AngularVel};
+      std::vector<compMask> requiredComponents = {ENUM_Position | ENUM_LinearVel,
+                                                  ENUM_Orientation | ENUM_AngularVel,
+                                                  ENUM_Scale | ENUM_ScalarMultFunc
+      };
     public:
       MovementSystem(State* state);
       bool onInit();

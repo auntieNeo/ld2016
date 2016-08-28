@@ -3,4 +3,4 @@ add_library(ecs STATIC
         ecsState.cpp
         ecsHelpers.cpp
         ecsSystem_movement.cpp
-        ecsSystem_wasdControls.cpp)
+        ecsSystem_controls.cpp)

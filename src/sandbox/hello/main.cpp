@@ -36,7 +36,7 @@
 
 #include "../../common/ecs/ecsHelpers.h"
 #include "../../common/ecs/ecsSystem_movement.h"
-#include "../../common/ecs/ecsSystem_wasdControls.h"
+#include "../../common/ecs/ecsSystem_controls.h"
 
 using namespace ld2016;
 using namespace ecs;
@@ -45,7 +45,7 @@ class EcsDemo : public Game {
   private:
     std::shared_ptr<WasdCamera> m_camera;
     std::shared_ptr<MeshObject> m_mesh;
-    WasdSystem wasdSystem;
+    ControlSystem wasdSystem;
     MovementSystem movementSystem;
   public:
     Delegate<bool(SDL_Event&)> systemsHandlerDlgt;
@@ -71,10 +71,8 @@ class EcsDemo : public Game {
       this->scene()->addObject(m_camera);
       this->setCamera(m_camera);
       m_mesh = std::shared_ptr<MeshObject>(
-          new MeshObject( state,
-                          "assets/models/sphere.dae",  // mesh
-                          "assets/textures/rt_bunny.png"  // texture
-          ));
+          new MeshObject(state, "assets/models/sphere.dae", "assets/textures/rt_bunny.png", <#initializer#>,
+                         <#initializer#>, <#initializer#>));
       this->scene()->addObject(m_mesh);
       float delta = 0.3f;
       for (int i = 0; i < 100; ++i) {

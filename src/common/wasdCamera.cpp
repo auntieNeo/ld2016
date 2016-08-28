@@ -31,7 +31,9 @@ namespace ld2016 {
   {
     ecs::CompOpReturn status = state.addLinearVel(id, {0.f, 0.f, 0.f});
     assert(status == ecs::SUCCESS);
-    status = state.addWasdControls(id);
+    status = state.addMouseControls(id, false, false);
+    assert(status == ecs::SUCCESS);
+    status = state.addWasdControls(id, 0, ecs::WasdControls::ROTATE_ALL_AXES);
     assert(status == ecs::SUCCESS);
   }
 }

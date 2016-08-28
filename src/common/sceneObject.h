@@ -49,6 +49,7 @@ namespace ld2016 {
         const SceneObject *,
         std::shared_ptr<SceneObject>
         > m_children;
+      SceneObject* m_parent = NULL;
 
       /**
        * This method recursively draws this object and all of its children.
@@ -132,6 +133,8 @@ namespace ld2016 {
       virtual void draw(const glm::mat4 &modelWorld,
                         const glm::mat4 &worldView, const glm::mat4 &projection,
                         float alpha, bool debug);
+
+      void reverseTransformLookup(glm::mat4& wv, float alpha) const;
 
       /**
        * Get ID
