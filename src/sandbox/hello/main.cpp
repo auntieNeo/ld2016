@@ -71,8 +71,7 @@ class EcsDemo : public Game {
       this->scene()->addObject(m_camera);
       this->setCamera(m_camera);
       m_mesh = std::shared_ptr<MeshObject>(
-          new MeshObject(state, "assets/models/sphere.dae", "assets/textures/rt_bunny.png", <#initializer#>,
-                         <#initializer#>, <#initializer#>));
+          new MeshObject(state, "assets/models/sphere.dae", "assets/textures/rt_bunny.png"));
       this->scene()->addObject(m_mesh);
       float delta = 0.3f;
       for (int i = 0; i < 100; ++i) {

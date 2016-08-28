@@ -23,7 +23,6 @@
  */
 
 #include <cstdlib>
-#include <lcms.h>
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>

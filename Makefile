@@ -78,6 +78,20 @@ bullet-js:
 	&& emmake make -j $(num_threads) \
 	&& emmake make install
 
+.PHONY: lcms-js
+lcms-js:
+	cd extern/bullet3 \
+	&& mkdir -p build-js install-js \
+	&& cd build-js \
+	&& emconfigure cmake \
+		-DCMAKE_BUILD_TYPE=debug \
+		-DBUILD_DEMOS=OFF \
+		-DBUILD_UNIT_TESTS=OFF \
+		-DCMAKE_INSTALL_PREFIX=../install-js \
+		.. \
+	&& emmake make -j $(num_threads) \
+	&& emmake make install
+
 .PHONY: clean
 clean:
 	rm -rf extern/*{build,install}
