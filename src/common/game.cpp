@@ -105,7 +105,7 @@ namespace ld2016 {
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glClearDepth(1.0);
     glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
+    glDepthFunc(GL_LEQUAL);
     glDisable(GL_CULL_FACE);
     glFrontFace(GL_CCW);
     glViewport(0, 0, m_width, m_height);

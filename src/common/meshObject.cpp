@@ -47,6 +47,7 @@ namespace ld2016 {
     assert(status == ecs::SUCCESS);
     status = this->state->addScale(id, scale);
     assert(status == ecs::SUCCESS);
+
     // Load the mesh from file using assimp
     m_loadMesh(meshFile);
     // Load the texture from file using SDL2

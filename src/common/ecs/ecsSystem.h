@@ -61,7 +61,7 @@ namespace ecs {
   static void discover(const entityId& id, void* data) {
     std::vector<entityId>* registry = (std::vector<entityId>*)data;
     registry->push_back(id);
-    printf("DISCOVERED: %u\n", id);
+//    printf("DISCOVERED: %u\n", id);
   }
   static void forget(const entityId& id, void* data) {
     std::vector<entityId>* registry = (std::vector<entityId>*)data;
@@ -69,7 +69,7 @@ namespace ecs {
                                                          registry->end(), id);
     if (position != registry->end()) {
       registry->erase(position);
-      printf("FORGOT: %u\n", id);
+//      printf("FORGOT: %u\n", id);
     }
   }
   template<typename Derived_System>
