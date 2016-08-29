@@ -220,8 +220,8 @@ class PyramidGame : public Game {
     }
 };
 
-Uint8 *gameMusic;
-Uint32 gameMusicLength;
+Uint8 *gameMusic[4];
+Uint32 gameMusicLength[4];
 
 void main_loop(void *instance) {
   PyramidGame *game = (PyramidGame *) instance;
@@ -248,11 +248,31 @@ int main(int argc, char **argv) {
   want.samples = 4096;
   want.callback = NULL;
 
+  int i = 0;
   SDL_LoadWAV(
       "./assets/audio/TitleScreen.wav",
       &want,
-      &gameMusic,
-      &gameMusicLength);
+      &gameMusic[i],
+      &gameMusicLength[i]);
+  i += 1;
+  SDL_LoadWAV(
+      "./assets/audio/IndustrialTechno_2.wav",
+      &want,
+      &gameMusic[i],
+      &gameMusicLength[i]);
+  i += 1;
+  SDL_LoadWAV(
+      "./assets/audio/YouLose.wav",
+      &want,
+      &gameMusic[i],
+      &gameMusicLength[i]);
+  i += 1;
+  SDL_LoadWAV(
+      "./assets/audio/YouWin.wav",
+      &want,
+      &gameMusic[i],
+      &gameMusicLength[i]);
+  i += 1;
 
   dev = SDL_OpenAudioDevice(
       NULL,  // device
@@ -264,10 +284,12 @@ int main(int argc, char **argv) {
   if (dev == 0) {
     fprintf(stderr, "Failed to open SDL audio device: %s\n", SDL_GetError());
   } else {
-    SDL_QueueAudio(
-        dev,
-        gameMusic,
-        gameMusicLength);
+    for (int i = 0; i < 4; ++i) {
+      SDL_QueueAudio(
+          dev,
+          gameMusic[i],
+          gameMusicLength[i]);
+    }
     SDL_PauseAudioDevice(dev, 0);  // start audio
   }
 
