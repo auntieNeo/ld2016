@@ -5,6 +5,7 @@ add_library(common STATIC
     debug.cpp
     game.cpp
     glError.cpp
+    loadCubeMap.cpp
     meshObject.cpp
     perspectiveCamera.cpp
     scene.cpp
@@ -16,6 +17,7 @@ add_library(common STATIC
     transformRAII.cpp
     transformStack.cpp
     wasdCamera.cpp
+    skyBox.cpp
     )
 
 target_link_libraries(common

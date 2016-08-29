@@ -62,4 +62,8 @@ DEFINE_SHADER(wireframe)
 #include "assets_shaders_texture.vert.c"
 #include "assets_shaders_texture.frag.c"
 DEFINE_SHADER(texture)
+
+#include "assets_shaders_skyQuad.vert.c"
+#include "assets_shaders_skyQuad.frag.c"
+DEFINE_SHADER(skyQuad)
 }

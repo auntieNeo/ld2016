@@ -33,6 +33,7 @@
 #include "./common/meshObject.h"
 #include "./common/scene.h"
 #include "./common/wasdCamera.h"
+#include "./common/skyBox.h"
 
 #include "./common/ecs/ecsHelpers.h"
 #include "./common/ecs/ecsSystem_movement.h"
@@ -50,6 +51,7 @@ class PyramidGame : public Game {
     std::shared_ptr<WasdCamera> m_camera;
     std::shared_ptr<MeshObject> m_pyrBottom, m_pyrTop, m_pyrThrusters, m_pyrFire;
     std::shared_ptr<SceneObject> m_camGimbal;
+    std::shared_ptr<SkyBox> m_skyBox;
     ControlSystem wasdSystem;
     MovementSystem movementSystem;
   public:
@@ -68,7 +70,7 @@ class PyramidGame : public Game {
                           80.0f * ((float) M_PI / 180.0f),  // fovy
                           0.1f,  // near
                           1000.0f,  // far
-                          glm::vec3(0.0f, -3.f, 0.0f),  // position
+                          glm::vec3(0.0f, -4.f, 0.0f),  // position
                           glm::angleAxis(
                               (float) M_PI * 0.5f,
                               glm::vec3(1.0f, 0.0f, 0.0f))
@@ -86,6 +88,8 @@ class PyramidGame : public Game {
                          {0.105f, 0.105f, 0.25f}));
       m_camGimbal = std::shared_ptr<SceneObject>(
           new SceneObject(state));
+      m_skyBox = std::shared_ptr<SkyBox>(
+          new SkyBox(state));
       float delta = 0.3f;
       for (int i = 0; i < 100; ++i) {
         Debug::drawLine( state,
@@ -98,7 +102,11 @@ class PyramidGame : public Game {
                          glm::vec3(1.0f, 0.0f, 1.0f));
       }
 
-      /*this->scene()->addObject(m_pyrBottom);
+      /*LoadResult loaded = m_skyBox->useCubeMap("sea", "png");
+      assert(loaded == LOAD_SUCCESS);
+      this->scene()->addObject(m_skyBox);
+
+      this->scene()->addObject(m_pyrBottom);
       m_pyrBottom->addChild(m_pyrTop);
       m_pyrBottom->addChild(m_pyrThrusters);
       m_pyrBottom->addChild(m_pyrFire);
@@ -113,7 +121,9 @@ class PyramidGame : public Game {
       state.addAngularVel(topId, glm::rotate(glm::quat(), 0.1f, {0.f, 0.f, 1.f}));*/
 
       this->scene()->addObject(m_pyrBottom);
-      this->setCamera(m_camera);
+      this->scene()->addObject(m_skyBox);
+      LoadResult loaded = m_skyBox->useCubeMap("sea", "png");
+      assert(loaded == LOAD_SUCCESS);
 
       m_pyrBottom->addChild(m_camGimbal);
       m_pyrBottom->addChild(m_pyrTop);
@@ -121,6 +131,7 @@ class PyramidGame : public Game {
       m_pyrBottom->addChild(m_pyrFire);
 
       m_camGimbal->addChild(m_camera);
+      this->setCamera(m_camera);
 
       entityId gimbalId = m_camGimbal->getId();
       state.addPosition(gimbalId, {0.f, 0.f, 1.f});

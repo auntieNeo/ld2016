@@ -57,6 +57,9 @@ namespace ld2016 {
 
       /** Shader for drawing textures */
       DECLARE_SHADER(texture);
+
+      /** Shader for drawing skybox */
+      DECLARE_SHADER(skyQuad);
   };
 }
 
