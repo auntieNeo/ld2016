@@ -37,6 +37,8 @@
 #include "../../common/ecs/ecsSystem_movement.h"
 #include "../../common/ecs/ecsSystem_controls.h"
 
+#define min(a, b) ((a) < (b) ? (a) : (b))
+
 using namespace ld2016;
 using namespace ecs;
 
@@ -60,14 +62,27 @@ class AudioDemo : public Game {
 };
 
 Uint8 *gameMusic;
-uint32 gameMusicLength;
+Uint32 gameMusicLength;
 
 void audioCallback(
     void *userdata,
     Uint8 *stream,
     int len)
 {
+  static int current = 0;
   SDL_memset(stream, 0, len);
+  while (len > 0) {
+    int chunk = min(len, gameMusicLength - current);
+    SDL_MixAudio(
+        stream,
+        gameMusic + current,
+        chunk,
+        SDL_MIX_MAXVOLUME);
+    stream += chunk;
+    len -= chunk;
+    current = (current + chunk) % gameMusicLength;
+    fprintf(stderr, "Copied audio to stream.\n");
+  }
 }
 
 void main_loop(void *instance) {
@@ -93,7 +108,13 @@ int main(int argc, char **argv) {
   want.format = AUDIO_F32;
   want.channels = 2;
   want.samples = 4096;
-  want.callback = audioCallback;
+  want.callback = NULL;
+
+  SDL_LoadWAV(
+      "./assets/audio/TitleScreen.wav",
+      &want,
+      &gameMusic,
+      &gameMusicLength);
 
   dev = SDL_OpenAudioDevice(
       NULL,  // device
@@ -105,9 +126,10 @@ int main(int argc, char **argv) {
   if (dev == 0) {
     fprintf(stderr, "Failed to open SDL audio device: %s\n", SDL_GetError());
   } else {
-    if (have != want) {
-      fprintf(stderr, "The SDL audio device does not support the desired spec!\n");
-    }
+    SDL_QueueAudio(
+        dev,
+        gameMusic,
+        gameMusicLength);
     SDL_PauseAudioDevice(dev, 0);  // start audio
   }
 
